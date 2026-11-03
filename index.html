@@ -1,0 +1,2735 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b0f17" />
+<title>BJJ for Wrestlers — White to Black Mind Map</title>
+<style>
+  :root{
+    --bg:#0b0f17;
+    --bg2:#0f1522;
+    --panel:#111927;
+    --panel2:#16202f;
+    --line:#223049;
+    --ink:#e7edf7;
+    --muted:#9fb0c9;
+    --muted2:#6f819e;
+    --accent:#4f8cff;
+    --gold:#e7c268;
+    --white:#c7d0dd;
+    --blue:#3b82f6;
+    --purple:#a855f7;
+    --brown:#d08a3e;
+    --black:#8b95a6;
+    --ok:#3ecf8e;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 20% -10%, #14203a 0%, var(--bg) 55%) fixed,var(--bg);
+    color:var(--ink);overflow:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .app{display:grid;grid-template-rows:auto auto 1fr;height:100vh;height:100dvh}
+  /* ---------- Top bar ---------- */
+  header{
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    padding:12px 18px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(20,30,50,.7),rgba(12,17,26,.4));
+    backdrop-filter:blur(6px);z-index:5;
+  }
+  .brand{display:flex;align-items:center;gap:12px;min-width:0}
+  .logo{
+    width:42px;height:42px;border-radius:12px;flex:0 0 auto;
+    background:conic-gradient(from 220deg,#e7c268,#3b82f6,#a855f7,#d08a3e,#c7d0dd,#e7c268);
+    display:grid;place-items:center;font-weight:800;color:#0b0f17;font-size:18px;
+    box-shadow:var(--shadow);letter-spacing:.5px;
+  }
+  .brand h1{font-size:17px;margin:0;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand p{margin:2px 0 0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .spacer{flex:1 1 40px}
+  /* ---------- Controls ---------- */
+  .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .search{position:relative}
+  .search input{
+    width:230px;padding:9px 12px 9px 34px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);font-size:13px;outline:none;
+  }
+  .search input:focus{border-color:var(--accent)}
+  .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.6}
+  .btn{
+    padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+    transition:.15s;white-space:nowrap;
+  }
+  .btn:hover{border-color:#33507e;background:#1a2740}
+  .btn:active{transform:translateY(1px)}
+  .btn .ico{display:inline-block;line-height:1}
+  .btn .short{display:none}
+  .btn,.chip,.mapbtns button,.zoomgroup button{-webkit-user-select:none;user-select:none;touch-action:manipulation}
+  .btn.primary{background:linear-gradient(180deg,#3f79e8,#2f62c9);border-color:#3f79e8;color:#fff}
+  .zoomgroup{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .zoomgroup button{border:none;background:var(--panel2);color:var(--ink);width:36px;height:37px;cursor:pointer;font-size:16px}
+  .zoomgroup button:hover{background:#1a2740}
+  .zoomgroup button+button{border-left:1px solid var(--line)}
+  /* ---------- Belt filter chips ---------- */
+  .belts{display:flex;gap:8px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--line);background:rgba(10,15,24,.4);flex-wrap:wrap}
+  .belts .lbl{font-size:12px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-right:2px}
+  .chip{
+    --c:#888;
+    display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;
+    border:1.5px solid color-mix(in srgb,var(--c) 55%, transparent);
+    background:color-mix(in srgb,var(--c) 14%, transparent);
+    color:var(--ink);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;user-select:none;
+  }
+  .chip .dot{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 25%, transparent)}
+  .chip .count{font-size:11px;font-weight:500;color:var(--muted);background:rgba(255,255,255,.06);padding:1px 7px;border-radius:999px}
+  .chip:hover{transform:translateY(-1px)}
+  .chip.off{opacity:.38;filter:saturate(.4)}
+  .chip.all{--c:var(--gold)}
+  .hint{font-size:12px;color:var(--muted2);margin-left:4px}
+  .legend{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-left:14px;padding-left:14px;border-left:1px solid var(--line)}
+  .ldot{width:11px;height:11px;border-radius:50%;display:inline-block;border:1.5px solid #0b0f17;box-shadow:0 0 4px rgba(0,0,0,.4)}
+  .ldot.green{background:#3ecf8e}
+  .ldot.purple{background:#a855f7}
+  /* ---------- Main split ---------- */
+  main{display:grid;grid-template-columns:1fr 380px;min-height:0;position:relative}
+  @media(max-width:960px){main{grid-template-columns:1fr 320px}}
+  /* ---------- Mobile: detail panel becomes a bottom sheet, chrome gets compact ----------
+     Scoped to `aside.detail` on purpose: #detailInner also carries the `detail` class. */
+  .sheetGrip{display:none}
+  .closeDetail{display:none}
+  aside.detail{z-index:30}
+  @media(max-width:900px){
+    main{grid-template-columns:1fr}
+    .sheetGrip{display:block;width:44px;height:4px;border-radius:99px;background:#2c3d5c;margin:10px auto 0;flex:0 0 auto}
+    aside.detail{
+      position:absolute;top:0;left:0;right:0;bottom:0;
+      border-left:none;border-radius:18px 18px 0 0;overflow:hidden;
+      box-shadow:0 -16px 48px rgba(0,0,0,.55);
+      transform:translateY(102%);
+      transition:transform .28s cubic-bezier(.3,.72,.25,1);
+    }
+    aside.detail.open{transform:translateY(0)}
+    .detail .head{padding:14px 16px 12px;padding-right:54px}
+    .detail .foot{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+    .closeDetail{
+      display:grid;place-items:center;position:absolute;top:10px;right:12px;z-index:2;
+      width:38px;height:38px;border-radius:50%;border:1px solid var(--line);
+      background:var(--panel2);color:var(--ink);font-size:15px;cursor:pointer;
+    }
+    .mapstat{font-size:11px;padding:4px 9px}
+    .mapbtns button{width:38px;height:38px}
+  }
+  @media(max-width:720px){
+    header{padding:10px 12px;gap:10px;padding-top:calc(10px + env(safe-area-inset-top,0px))}
+    .logo{width:34px;height:34px;font-size:14px;border-radius:10px}
+    .brand{gap:9px}
+    .brand h1{font-size:14.5px}
+    .brand p{font-size:10.5px}
+    .spacer{display:none}
+    .controls{width:100%;gap:8px}
+    .search{flex:1 1 100%}
+    .search input{width:100%;font-size:16px}
+    .btn{padding:9px 11px;font-size:12.5px}
+    .btn .long{display:none}
+    #exportBtn .short{display:inline}
+    .zoomgroup button{width:36px;height:36px}
+    .belts{padding:9px 12px;gap:7px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .belts::-webkit-scrollbar{display:none}
+    .belts .lbl,.belts .legend,.belts .hint{display:none}
+    .chip{padding:8px 14px;flex:0 0 auto}
+    /* 16px+ inputs stop iOS Safari from auto-zooming on focus */
+    .videoInput,.editbox{font-size:16px}
+  }
+  /* ---------- Map canvas ---------- */
+  .mapwrap{position:relative;overflow:hidden;min-height:0}
+  svg.map{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+  svg.map.panning{cursor:grabbing}
+  .edge{fill:none;stroke:#2b3c58;stroke-width:2}
+  .edge.hl{stroke:var(--accent);stroke-width:2.5}
+  .node{cursor:pointer}
+  .node .card{
+    fill:var(--card,#101a2a);stroke:#27384f;stroke-width:1.25;
+    transition:stroke .15s, filter .15s;
+  }
+  .node:hover .card{stroke:#3f5a85}
+  .node.selected .card{stroke:var(--accent);stroke-width:2.2;filter:drop-shadow(0 0 10px rgba(79,140,255,.45))}
+  .node.dim{opacity:.28}
+  .node .accent{stroke:var(--belt);stroke-width:4;stroke-linecap:round}
+  .node .title{fill:var(--ink);font-weight:700;font-size:14px}
+  .node .desc{fill:var(--muted);font-size:11.5px}
+  .node .tag{fill:var(--belt);font-size:10px;font-weight:700;letter-spacing:.04em}
+  .node .more{fill:var(--muted2);font-size:10px;font-weight:700}
+  .node.root .card{fill:#131d30}
+  .cardInner{font-family:inherit}
+  .cardInner .t{font-weight:700;font-size:14px;color:var(--ink);line-height:1.2;margin:0 0 3px}
+  .cardInner .d{font-size:11.5px;color:var(--muted);line-height:1.35;margin:0}
+  .cardInner .row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .cardInner .pill{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--belt);background:color-mix(in srgb,var(--belt) 16%, transparent);padding:2px 8px;border-radius:999px}
+  .cardInner .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--belt)}
+  .cardInner .more{margin-left:8px;font-size:10px;font-weight:700;color:var(--muted2)}
+  .node .vdot{filter:drop-shadow(0 0 4px rgba(0,0,0,.5))}
+  /* floating map buttons */
+  .mapbtns{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px;z-index:3}
+  .mapbtns button{
+    width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);font-size:18px;cursor:pointer;box-shadow:var(--shadow)
+  }
+  .mapbtns button:hover{background:#1a2740;border-color:#33507e}
+  .mapstat{position:absolute;left:14px;bottom:14px;font-size:11.5px;color:var(--muted2);background:rgba(10,15,24,.6);padding:5px 10px;border-radius:8px;border:1px solid var(--line);z-index:3}
+  /* ---------- Detail panel ---------- */
+  .detail{border-left:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
+  .detail .head{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+  .beltline{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .beltbadge{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;color:#0b0f17;background:var(--belt);letter-spacing:.02em}
+  .beltbadge.light{color:#0b0f17}
+  .crumb{font-size:12px;color:var(--muted2)}
+  .detail h2{font-size:20px;margin:2px 0 0;line-height:1.2}
+  .detail .body{padding:16px 18px;overflow:auto;min-height:0;flex:1;overscroll-behavior:contain}
+  .sec{margin-bottom:20px}
+  .sec .lbl{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;margin-bottom:9px}
+  .sec .lbl .ico{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;background:color-mix(in srgb,var(--c) 22%, transparent);color:var(--c)}
+  .descbox{font-size:14px;line-height:1.55;color:#cdd8ea;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:12px 14px}
+  ol.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+  ol.steps li{counter-increment:s;position:relative;padding:0 0 14px 38px;font-size:13.5px;line-height:1.5;color:#c4d1e6}
+  ol.steps li:not(:last-child)::before{content:"";position:absolute;left:12px;top:22px;bottom:0;width:2px;background:var(--line)}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:12px;background:linear-gradient(180deg,#22314d,#182541);color:var(--accent);border:1px solid #2c4066}
+  .whybox{font-size:13.5px;line-height:1.6;color:#c4d1e6}
+  .whybox b{color:var(--gold);font-weight:700}
+  .cues{display:flex;flex-wrap:wrap;gap:7px}
+  .cue{font-size:12px;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+  .cue::before{content:"✓ ";color:var(--ok);font-weight:800}
+  .children{display:flex;flex-direction:column;gap:8px}
+  .childrow{
+    display:flex;align-items:flex-start;gap:11px;padding:11px 12px;border-radius:11px;cursor:pointer;
+    background:var(--panel2);border:1px solid var(--line);transition:.15s;
+  }
+  .childrow:hover{border-color:#3f5a85;transform:translateX(2px)}
+  .childrow .num{flex:0 0 auto;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:800;background:#1c2a44;color:var(--accent);margin-top:1px}
+  .childrow .ct{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:2px}
+  .childrow .cd{font-size:12px;color:var(--muted);line-height:1.4}
+  .childrow .go{margin-left:auto;color:var(--muted2);font-size:16px;align-self:center}
+  .empty{padding:30px 18px;text-align:center;color:var(--muted2)}
+  .empty .big{font-size:40px;margin-bottom:10px}
+  .empty p{font-size:13px;line-height:1.6;max-width:280px;margin:6px auto 0}
+  .backbtn{width:100%;justify-content:center;margin-bottom:14px}
+  .kbd{font-family:ui-monospace,Consolas,monospace;background:#0d1626;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:11px;color:var(--muted)}
+  .foot{padding:10px 18px;border-top:1px solid var(--line);font-size:11px;color:var(--muted2);line-height:1.5}
+  .scroll::-webkit-scrollbar{width:10px;height:10px}
+  .scroll::-webkit-scrollbar-thumb{background:#223049;border-radius:8px;border:2px solid var(--panel)}
+  .scroll::-webkit-scrollbar-track{background:transparent}
+  /* ---------- Video link section ---------- */
+  .videoRow{display:flex;gap:8px;flex-wrap:wrap}
+  .videoInput{
+    flex:1 1 220px;min-width:180px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);font-size:13px;outline:none;
+  }
+  .videoInput:focus{border-color:var(--accent)}
+  .videoOpen{display:inline-flex;align-items:center;gap:7px;margin:12px 0 2px;font-size:13px;font-weight:600;color:var(--accent);text-decoration:none}
+  .videoOpen:hover{text-decoration:underline}
+  .videoEmbed{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#000}
+  .videoEmbed iframe{display:block;width:100%;aspect-ratio:16/9;border:none}
+  .videoEmbed video{display:block;width:100%;max-height:320px;background:#000}
+  .videoNote{font-size:11.5px;color:var(--muted2);margin-top:8px;line-height:1.5}
+  /* ---------- Add bubble / auto-fill ---------- */
+  .btn:disabled{opacity:.45;cursor:default;transform:none}
+  .btn.danger{border-color:#7a3540;background:rgba(220,80,80,.08);color:#f2a0a0}
+  .btn.danger:hover{background:rgba(220,80,80,.16);border-color:#a04a5a}
+  .addbox{background:rgba(79,140,255,.07);border:1.5px dashed #33507e;border-radius:12px;padding:12px 14px}
+  .aibox{background:rgba(231,194,104,.06);border:1px solid #3a3320;border-radius:12px;padding:12px 14px}
+  .addrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .addrow .videoInput{flex:1 1 180px;min-width:150px}
+  .statusline{font-size:12.5px;line-height:1.45;margin:8px 0 2px;padding:8px 11px;border-radius:9px}
+  .statusline.busy{color:var(--muted);background:var(--panel2);border:1px solid var(--line)}
+  .statusline.ok{color:#7fe0b1;background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.35)}
+  .statusline.err{color:#f2a0a0;background:rgba(220,80,80,.12);border:1px solid rgba(220,80,80,.35)}
+  .editbox{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:13.5px;line-height:1.5;outline:none;resize:vertical;font-family:inherit}
+  .editbox:focus{border-color:var(--accent)}
+  .hintinline{font-size:10.5px;font-weight:500;color:var(--muted2);text-transform:none;letter-spacing:0;margin-left:4px}
+  .titleinput{font-size:20px;font-weight:700;background:transparent;border:1px solid transparent;color:var(--ink);padding:4px 8px;border-radius:8px;width:100%;outline:none;font-family:inherit}
+  .titleinput:hover{border-color:var(--line)}
+  .titleinput:focus{border-color:var(--accent);background:var(--panel2)}
+  .savedflash{float:right;font-size:11px;color:var(--ok);opacity:0;transition:opacity .25s;font-weight:600;margin:2px 0 0 8px}
+  .savedflash.show{opacity:1}
+  .aiset{margin-top:10px}
+  .aiset summary{cursor:pointer;font-size:12px;color:var(--muted);user-select:none;padding:4px 0}
+  .aiset[open] summary{margin-bottom:6px}
+  /* ---------- Your own steps on built-in bubbles ---------- */
+  ol.steps li.yours{border:1px dashed #4a4028;background:rgba(231,194,104,.06);border-radius:10px;padding-right:42px}
+  ol.steps li.yours::before{background:linear-gradient(180deg,#332c17,#241f10);color:var(--gold);border-color:#4a4028}
+  .steprmv{position:absolute;right:8px;top:0;width:24px;height:24px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--muted);cursor:pointer;font-size:11px;line-height:1;display:grid;place-items:center;padding:0}
+  .steprmv:hover{color:#f2a0a0;border-color:#a04a5a;background:rgba(220,80,80,.1)}
+  /* ---------- Drag → My Skills ---------- */
+  .cardInner{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  .node.draggable{cursor:grab}
+  body.dragging,body.dragging .node{cursor:grabbing}
+  .dragGhost{position:fixed;z-index:100;pointer-events:none;display:none;transform:translate(-50%,-135%);max-width:250px;
+    background:#13253b;border:1.5px solid var(--ok);border-radius:12px;padding:9px 13px;box-shadow:0 14px 34px rgba(0,0,0,.55)}
+  .dragGhost .t{font-weight:700;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dragGhost .s{font-size:11px;color:var(--muted);margin-top:2px}
+  .node.dropok .card{stroke:#3f8f7a;stroke-dasharray:5 4}
+  .node.dropover .card{stroke:var(--ok);stroke-width:2.5;filter:drop-shadow(0 0 10px rgba(62,207,142,.5))}
+  .edge.dragline{stroke:var(--ok);stroke-width:2.5;stroke-dasharray:6 5;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">BJJ</div>
+      <div>
+        <h1>Brazilian Jiu-Jitsu for Wrestlers</h1>
+        <p>White → Black belt roadmap · position-first, takedown-to-submission systems</p>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="controls">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9fb0c9" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input id="search" type="text" placeholder="Search techniques… ( / )" autocomplete="off"/>
+      </div>
+      <button class="btn" id="expandAll" title="Expand all"><span class="ico">⊞</span><span class="long">Expand all</span></button>
+      <button class="btn" id="collapseAll" title="Collapse all"><span class="ico">⊟</span><span class="long">Collapse all</span></button>
+      <div class="zoomgroup">
+        <button id="zoomOut" title="Zoom out">−</button>
+        <button id="zoomIn" title="Zoom in">+</button>
+      </div>
+      <button class="btn primary" id="fitBtn" title="Fit to view"><span class="ico">⤢</span><span class="long">Fit to view</span></button>
+      <button class="btn" id="exportBtn" title="Download a copy of this file with your video links and custom bubbles baked in — the copy is self-contained"><span class="ico">⬇</span><span class="long">Export self-contained</span><span class="short">Export</span></button>
+    </div>
+  </header>
+
+  <div class="belts" id="belts">
+    <span class="lbl">Belt</span>
+    <!-- chips injected -->
+    <span class="legend"><span class="ldot green"></span>video linked <span class="ldot purple"></span>no video</span>
+    <span class="hint">Tip: click a bubble for the full how &amp; why · drag a bubble onto <b>My Skills</b> to build your personal tree · add a child bubble to any bubble — the AI drafts it · scroll to zoom</span>
+  </div>
+
+  <main>
+    <div class="mapwrap">
+      <svg class="map" id="svg">
+        <g id="viewport"></g>
+      </svg>
+      <div class="mapstat" id="stat"></div>
+      <div class="mapbtns">
+        <button id="mbFit" title="Fit to view">⤢</button>
+        <button id="mbIn" title="Zoom in">+</button>
+        <button id="mbOut" title="Zoom out">−</button>
+        <button id="mbExpand" title="Expand all">⊞</button>
+      </div>
+    </div>
+
+    <aside class="detail">
+      <div class="sheetGrip"></div>
+      <button class="closeDetail" id="closeDetailBtn" aria-label="Close detail panel">✕</button>
+      <div id="detailInner" class="detail scroll" style="display:flex;flex-direction:column;min-height:0;flex:1"></div>
+    </aside>
+  </main>
+</div>
+
+<script>
+/* =========================================================================
+   DATA — BJJ curriculum from a wrestler's perspective
+   Each technique: concise `desc` (shown on the bubble) + detailed
+   `how` (step-by-step) and `why` (the principle) shown in the panel.
+   ========================================================================= */
+const T = (title, desc, how, why, cues) => ({ title, desc, how, why, cues });
+const TOPIC = (title, desc, children) => ({ title, desc, children });
+
+const ROOT = {
+  title: "BJJ for Wrestlers",
+  desc: "A position-first, takedown-driven path from white to black belt. Build a wrestling base, turn takedowns into ground dominance, and layer submissions on top.",
+  children: [
+
+  /* ============================ WHITE BELT ============================ */
+  {
+    belt:"White", title:"White Belt",
+    desc:"Establish the grappling fundamentals every wrestler must re-learn: position, movement, and the first guard-and-submission toolkit.",
+    children:[
+      TOPIC("Position & Pressure Fundamentals",
+        "Before submissions, learn the hierarchy of positions and the body mechanics that make a wrestler dangerous on the ground.",
+        [
+          T("Position Hierarchy",
+            "Understand the ranked map of ground positions — from side control down to your own guard — so you always know what to chase.",
+            [
+              "Learn the ranking: back control > mount > side control > knee-on-belly > half guard > open guard > closed guard > your own guard.",
+              "Memorize the escape direction for each position (where the space opens) before you learn any technique.",
+              "In every drill, name your position out loud and state the one position above it you are trying to reach.",
+            ],
+            "Wrestlers instinctively hunt for takedowns and top position. Position hierarchy gives you a shared language and a decision tree so you are never scrambling for 'what now?' under pressure.",
+            ["Position before submission","Know the space that opens","One goal at a time"]
+          ),
+          T("Body Mechanics & Base",
+            "Transfer your wrestling base to the ground — low center of gravity, engaged core, and the ability to post and recover.",
+            [
+              "Keep your hips low and heavy; drive from the legs, not the arms, in every bridge and sprawl.",
+              "Practice the 'low posture': knees bent, chest over hips, ready to explode to any direction.",
+              "Drill sprawls and bridges on the mat until they are automatic, since they feed both defending and attacking.",
+            ],
+            "Base is the foundation of all ground pressure and escapes. A wrestler's athletic base makes your top control smothering and your sweeps powerful — but it only works if the mechanics are dialed in.",
+            ["Hips low, chest over hips","Power from the legs","Athletic posture"]
+          ),
+          T("Grip & Hand Fighting",
+            "The grip fight decides where the match goes. Learn to secure, break, and use grips as a wrestler.",
+            [
+              "Attack their grips first: break a wrist grip by lifting the hand and pulling your arm in, then re-grip.",
+              "Secure deep grips (collar, sleeve, wrist) before you act on them — control, then move.",
+              "Keep both hands active: one grips, one frames; never let both hands go idle.",
+            ],
+            "Grips are the levers that create all position and submission openings. Wrestlers already fight for control — the gi just gives more to grab, so hand-fighting becomes a constant weapon.",
+            ["Control then move","Keep both hands busy","Break before you act"]
+          ),
+        ]),
+      TOPIC("Guard Retention & Mobility",
+        "When you get taken down (and you will), the guard is your safety net. Learn to stay connected, create space, and reset.",
+        [
+          T("Shrimping (Hip Escape)",
+            "The single most important ground movement: creating space and resetting your hips while staying connected.",
+            [
+              "Bend the knees and dig the shoulder and elbow into the mat.",
+              "Push with that arm and hip to swing the hips back into a crescent path, then back forward.",
+              "Keep the body in one connected unit — shoulders, hips, legs moving as a chain.",
+              "Use it to create space, recover guard, or set up a sweep without losing contact.",
+            ],
+            "Shrimping is the base language of BJJ. It turns a lost position into a live one and is the mechanic inside every sweep and escape. Wrestlers who master it stop feeling helpless when taken down.",
+            ["Shoulder and elbow dig in","Crescent hip path","Stay connected"]
+          ),
+          T("Closed Guard",
+            "The classic defensive position: legs locked, hands framed, and you in control of the distance.",
+            [
+              "Clamp the legs around the trunk and hug the elbows to the ribs to control their frame.",
+              "Frame with the forearms on the chest and hips to stop forward pressure.",
+              "Keep the hips high and the legs tight — the tighter the clamp, the safer the position.",
+              "From here you can post, off-balance them, and set up a sweep or attack.",
+            ],
+            "Closed guard is the first 'I am not in trouble' position. It lets a wrestler who gets taken down immediately neutralize the top pressure and start dictating the game again.",
+            ["Elbows hugged in","Hips high, legs tight","Frame the chest"]
+          ),
+          T("Open Guard",
+            "When one leg opens, use it to control, off-balance, and set up sweeps or attacks.",
+            [
+              "Keep one foot hooked behind their hip while the other frames or hooks their far arm.",
+              "Use the open leg to push their hip off-center and pull them forward to collapse the spine.",
+              "Keep the connected leg active — it is your rudder for direction and distance.",
+              "Flow into a kimura, triangle, or sweep as their balance breaks.",
+            ],
+            "Open guard is where wrestlers first find attack. It turns defense into a position where you control their balance and can finish with chokes or arm locks — a huge contrast to a wrestler's usual 'get up or get submitted' dilemma.",
+            ["One leg connected","Collapse their spine","Flow to attack"]
+          ),
+          T("Technical 6 / 50-50 Guard",
+            "The natural guard for a wrestler: legs on the hips, ready to sprawl or sweep from a takedown-like base.",
+            [
+              "Land on your side with both legs hooked over their hips, like a sprawl position.",
+              "Frame their chest and neck, keeping your hips flat and your back on the mat.",
+              "Attack with a body lock (arms under the arms, legs on the hips) to sweep or take the back.",
+              "Use your wrestling base to defend takedowns and immediately counter-sweep.",
+            ],
+            "Technical 6 is essentially a wrestler's base turned into guard. It lets you use the sprawl, body lock, and posture you already have to sweep or steal the back from the bottom.",
+            ["Sprawl-like base","Frame the chest","Body-lock to sweep"]
+          ),
+        ]),
+      TOPIC("Sweeps",
+        "The first, highest-percentage sweeps every wrestler must have. Use your base and body control to reverse the top player and end up on top.",
+        [
+          T("Hip Bump Sweep",
+            "The most fundamental sweep: use your hips to lift and roll a posted top player from closed guard.",
+            [
+              "Keep the closed guard tight with both legs clamped and the elbows hugged in.",
+              "Pull their head or arm to off-balance them and create the angle.",
+              "Plant one foot, then drive the hips up and over toward the trapped side.",
+              "Use the hip bump to roll them onto their back while you recover to guard.",
+            ],
+            "The hip bump is the first sweep and a direct transfer of a wrestler's hip power. It teaches the core sweep mechanic — off-balance, then drive the hips — that underlies every more advanced sweep.",
+            ["Tight closed guard","Off-balance first","Drive the hips up"]
+          ),
+          T("Scissor Sweep",
+            "A classic open-guard sweep using the legs as scissors to roll a top player off balance.",
+            [
+              "Set up the open guard with one leg hooked and the other free.",
+              "Control their head and the near arm to set the off-balance.",
+              "Scissor the free leg across their body as you turn.",
+              "Lift with the hips and roll them to your guard.",
+            ],
+            "The scissor sweep is the bridge from open guard to reversal. For a wrestler, the scissoring leg action mirrors the leg control they already use, making it an intuitive first offensive sweep.",
+            ["One leg hooked","Control the head","Scissor and lift"]
+          ),
+          T("Kimura Sweep",
+            "Use the kimura to off-balance and roll the opponent while keeping a locked grip — a pure wrestler's control sweep.",
+            [
+              "Establish the kimura (figure-four) on one of their arms.",
+              "Rotate their shoulder up and back to pull them off center.",
+              "Keep the figure-four locked and post one leg to roll.",
+              "Use the arm control to drive the reversal back to your guard.",
+            ],
+            "The kimura sweep is the control-based sweep a wrestler loves: the grip does the off-balancing while the body does the rolling. It doubles as a submission threat, so the opponent can't just post and reset.",
+            ["Lock the figure-four","Rotate to off-balance","Roll with the grip"]
+          ),
+          T("Body-Lock / Butterfly Sweep",
+            "Use a body lock and leg drive to sweep from the bottom — the double-leg mechanic turned into a guard sweep.",
+            [
+              "From your guard, post and take the body lock (arm under, leg over the hip).",
+              "Break their base by pulling the head and driving the legs.",
+              "Use the leg drive to lift and spin them, like a double-leg takedown.",
+              "Finish the sweep and land back in your guard or on top.",
+            ],
+            "This is the wrestler's signature bottom sweep. The body lock and leg drive are the same mechanics as a double-leg, so a wrestler can sweep from the bottom with the same power they use to take someone down.",
+            ["Take the body lock","Break the base","Leg drive to spin"]
+          ),
+          T("Head-Control Flat Guard Sweep",
+            "Control the head and use the legs to sweep a postured top player from flat guard.",
+            [
+              "From flat guard, control their head with one hand and their arm with the other.",
+              "Hook the legs to off-balance and set the sweep.",
+              "Pull the head and lift with the hips to roll them.",
+              "Recover to your guard as they turn.",
+            ],
+            "Head control is the simplest way to off-balance a postured top player, and it flows naturally from the hand-fighting a wrestler already does. It is a reliable, low-risk sweep for early training.",
+            ["Control the head","Hook the legs","Pull and lift"]
+          ),
+        ]),
+      TOPIC("First Submissions",
+        "A small, high-percentage arsenal that works from any guard or top position. Learn these deeply before adding more.",
+        [
+          T("Triangle Choke",
+            "The go-to guard attack: a leg entanglement that chokes with a scissoring motion.",
+            [
+              "Hook one leg over their shoulder and bring the other foot behind their neck.",
+              "Pull their head down and turn your body toward the trapped arm to tighten the scissors.",
+              "Lock the ankle, widen the triangle, and squeeze with the inner thighs and hip flexors.",
+              "Keep their head down — the angle, not the squeeze alone, is what finishes.",
+            ],
+            "The triangle is the most learnable submission from the bottom and the perfect first submission for a wrestler. It uses the leg entanglement and body control you already understand, and finishes from guard without you ever losing position.",
+            ["Ankle locked, head down","Squeeze with the hips","Turn toward the trapped arm"]
+          ),
+          T("Armbar (from Guard)",
+            "Isolate one arm on the straight-arm extension and hyperextend the elbow.",
+            [
+              "Isolate the arm — control the wrist and bring it to your hip/shoulder line.",
+              "Keep your hips close and the arm on a straight line to your body.",
+              "Bridge with the hips over the arm and pull down on the elbow to hyperextend.",
+              "Rotate your body toward them to increase the angle and finish.",
+            ],
+            "The armbar is the first arm lock and the bridge between guard and submission. For a wrestler who controls the grip fight, isolating one arm is natural, and the hip bridge uses the same hip power as a sweep.",
+            ["Arm on a straight line","Hips close","Bridge and pull"]
+          ),
+          T("Kimura / Americana",
+            "A figure-four arm lock from the side — a natural follow to the hand-fighting you already do.",
+            [
+              "Create the figure-four: your hand grips their wrist, their hand is trapped under your armpit.",
+              "Rotate their shoulder up and back across your body while you sit up.",
+              "Bring their trapped arm across your chest and finish by pulling and turning them.",
+              "Use it as a transitional attack after breaking their posture.",
+            ],
+            "The kimura flows directly from the wrist and hand control a wrestler already loves. It doubles as an off-balancing tool — even when it does not tap, it breaks their posture and sets up sweeps and other attacks.",
+            ["Figure-four locked","Rotate the shoulder up","Pull across the chest"]
+          ),
+          T("Guillotine Choke",
+            "A strangle from the top or bottom using the arm and forearm around the neck.",
+            [
+              "Hook the arm around the neck and lock the hands (figure-four or a high collar grip).",
+              "Keep the forearm across the throat and pull their head down into your armpit.",
+              "Squeeze with the bicep and the opposite arm, keeping the angle tight.",
+              "From the bottom, post and off-balance to create the choke angle.",
+            ],
+            "The guillotine is the most common transition choke and a natural finish after a body lock or takedown for a wrestler. It rewards the body control and hand-fighting that wrestling already develops.",
+            ["Forearm across the throat","Head into the armpit","Tighten the angle"]
+          ),
+          T("Rear Naked Choke (intro)",
+            "The signature submission from the back — the ultimate position for a wrestler who can take it.",
+            [
+              "From the back, secure a deep base with the hooks (or body lock) and control the head.",
+              "Thread the arm under the chin, lock the hands, and keep the elbow tight to the ribs.",
+              "Squeeze with the bicep and the tricep, keeping the angle on the carotid, not the windpipe.",
+              "Stay compact and connected — position first, then the choke.",
+            ],
+            "The rear naked is the payoff for every wrestler who can take the back. It is the highest-percentage finish and the reason back control sits at the top of the position hierarchy.",
+            ["Deep hooks first","Squeeze with the arms","Carotid angle"]
+          ),
+        ]),
+      TOPIC("Wrestler Transitions (Takedown → Ground)",
+        "This is your superpower: use the takedowns you already throw to set up guard, sweeps, and submissions.",
+        [
+          T("Double Leg → Mount",
+            "Turn a double-leg takedown directly into mount for immediate top control.",
+            [
+              "Shoot the double leg and bring them down to the mat.",
+              "As they hit the ground, post one hand, drive one knee over their chest, and land in mount.",
+              "Keep the head control and the knees pinning the hips to stop the sprawl.",
+              "From mount, post up, re-secure, and go to a submission or pass.",
+            ],
+            "This is the cleanest way a wrestler converts a takedown into BJJ top control. It keeps you in the dominant position without a scramble, so the tap — not the scramble — is the goal.",
+            ["Knee over the chest","Control the head","Land in mount"]
+          ),
+          T("Single Leg → Guard Attack",
+            "Use the single-leg to land in a position where you can immediately attack with a choke or arm lock.",
+            [
+              "Take the single leg and, as they fall, turn their head to one side.",
+              "Catch the far arm with a kimura or the near arm with a guillotine as they land.",
+              "Use the single-leg body control to prevent them from recovering to guard.",
+              "Follow through with the choke or arm lock from the landed position.",
+            ],
+            "Wrestlers already control the body and the head during a single-leg. Adding a choke or arm lock to that control turns a plain takedown into a high-percentage finish.",
+            ["Turn the head","Catch the far arm","Body control prevents recovery"]
+          ),
+          T("Sprawl → Back Take",
+            "Defend a takedown with the sprawl and use the follow-through to steal the back.",
+            [
+              "As they shoot, sprawl and drive the hips back to stop the takedown.",
+              "Pivot the hips and wrap the legs around their far side (body lock) as they commit.",
+              "Use the momentum to rotate them onto their chest and thread the arm for the back.",
+              "From the back, secure the base and go to the rear naked choke.",
+            ],
+            "The sprawl is a wrestler's most natural defense. Extending it into a body lock and back take means you are never just 'defending' — you are attacking on the very move they expected to score with.",
+            ["Sprawl to stop","Pivot into body lock","Rotate to the back"]
+          ),
+          T("Takedown Defense & Counter",
+            "Read the shot, stop it, and use their commitment against them.",
+            [
+              "Recognize the level change early and post the base hand before they commit.",
+              "Frame the neck or the hips to create space and control the direction.",
+              "Counter with a body lock, sweep, or takedown of your own as they are extended.",
+              "Stay active — defense should flow straight into offense, not just a reset.",
+            ],
+            "Wrestlers are already good at reading shots. In BJJ the same reads are rewarded even more, because the counter (body lock, sweep, back take) is more varied and higher-value than in pure wrestling.",
+            ["Read the level change","Frame for space","Flow into a counter"]
+          ),
+        ]),
+      TOPIC("Drilling & Rolling Habits",
+        "How to practice so the positions and transitions above actually become automatic under pressure.",
+        [
+          T("Positional Sparring",
+            "Sparring from a set position with a clear goal, to build specific skills under resistance.",
+            [
+              "Set a position (e.g., your guard, their mount) and a single goal (e.g., 'escape to guard' or 'pass').",
+              "Roll at 50–60% with the goal in mind, stopping to reset and repeat.",
+              "Focus on process and mechanics, not just on making the tap.",
+              "Progress the goal once you can do it reliably.",
+            ],
+            "Positional sparring is the fastest way to turn a known technique into a reliable one. For a wrestler, it bridges the gap between knowing the takedown and knowing what to do the instant you land on the ground.",
+            ["Set position + goal","Roll at 50–60%","Process over the tap"]
+          ),
+          T("Chain Drilling",
+            "Link moves into sequences so one action naturally leads to the next.",
+            [
+              "Pick a starting position and a 3–4 move chain (e.g., close guard → open → kimura → triangle).",
+              "Drill the chain slowly and cleanly, emphasizing the transition between each link.",
+              "Add speed and then resistance as the chain becomes smooth.",
+              "End by rolling the chain at speed with a partner.",
+            ],
+            "Chains build the 'next move is automatic' quality that separates strong grapplers from hesitant ones. Wrestlers, who already chain takedoffs, will find chain drilling very natural.",
+            ["3–4 linked moves","Slow, then fast","Transition is the key"]
+          ),
+          T("Rolling Etiquette & Communication",
+            "How to be a good training partner and learn faster from every roll.",
+            [
+              "Agree on the goal and pace before you roll; match your partner's level.",
+              "Be honest about taping, injuries, and when to stop.",
+              "Give and ask for feedback — describe what you felt and what you want to improve.",
+              "Protect the tap: the goal is to learn, not to prove.",
+            ],
+            "Good rolling habits build trust, which means partners go harder and give better feedback. For a wrestler entering the gi community, showing respect for the sport earns you higher-quality training.",
+            ["Agree on goal and pace","Communicate feedback","Protect the tap"]
+          ),
+        ]),
+    ]
+  },
+
+  /* ============================ BLUE BELT ============================ */
+  {
+    belt:"Blue", title:"Blue Belt",
+    desc:"Expand the game: advanced guard systems, dedicated passing, back control, and the submissions that come from each. Build full transitions, not isolated tricks.",
+    children:[
+      TOPIC("Advanced Guard Systems",
+        "Move from basic closed/open guard to the modern, active guard systems that let a wrestler attack from the bottom with intent.",
+        [
+          T("De La Riva Guard (DLR)",
+            "An outside hook guard that controls the hip and arm to off-balance and attack.",
+            [
+              "Hook the leg over their hip from the outside, controlling the far hip and the near arm.",
+              "Use the DLR leg to pull their hip up and off their base.",
+              "Attack with a kimura, armbar, or sweep as their balance breaks.",
+              "Switch the hook side to keep the pressure moving and unpredictable.",
+            ],
+            "DLR is a control-and-off-balance system that matches a wrestler's love of body control. It lets you attack with the arm and sweep without ever giving up the connected, safe guard.",
+            ["Outside hook on the hip","Pull them off balance","Attack with the arm"]
+          ),
+          T("Spider Guard",
+            "Feet on the shoulders/arms to create space and set up trips, sweeps, and attacks.",
+            [
+              "Place the feet on their shoulders or forearms and pull to open space.",
+              "Use the feet to control the arms and keep the frame open.",
+              "Sweep with a hip lift or trip as their weight shifts forward.",
+              "Flow into an armbar or kimura from the opened position.",
+            ],
+            "Spider guard uses foot-and-hand control to create the exact space a wrestler likes to make with frames. It is safe, active, and opens direct arm attacks.",
+            ["Feet on shoulders/arms","Pull for space","Trip or sweep"]
+          ),
+          T("Butterfly Guard",
+            "The feet hooked behind the thighs to create a powerful platform for sweeps and attacks.",
+            [
+              "Hook both feet behind the inner thighs, like a butterfly sit-up position.",
+              "Use the legs as a platform to lift and spin them for a butterfly sweep.",
+              "Control the body with the feet to off-balance and set up attacks.",
+              "Flow into a body-lock sweep or a leg entanglement attack.",
+            ],
+            "Butterfly guard is essentially the wrestler's double-leg and body-lock mechanics turned into a bottom attack. The same leg drive that lifts a takedown here sweeps the opponent.",
+            ["Feet behind the thighs","Platform to lift","Body-lock sweep"]
+          ),
+          T("Deep Half Guard (intro)",
+            "A safe, connected bottom position from a half guard that controls the base and sets up sweeps.",
+            [
+              "From a half guard, tuck the head under the arm and hook the far leg behind the knee.",
+              "Keep the connected leg and a solid base — the head tucked creates the safety.",
+              "Use the body to off-balance and sweep, or set up a triangle.",
+              "Maintain the connection; never let go of the leg hook.",
+            ],
+            "Deep half is the 'I am completely safe' guard for a bottom player. For a wrestler who values not being passed, it is the gold standard of defensive control.",
+            ["Head under the arm","Far leg hooked","Safe and connected"]
+          ),
+        ]),
+      TOPIC("Sweeps (Intermediate)",
+        "Control-based sweeps that flow out of the advanced guard systems. Off-balance first, then roll with the body and legs.",
+        [
+          T("De La Riva Sweep",
+            "Use the de la riva to control the hip and arm, then off-balance and sweep the top player.",
+            [
+              "Set the DLR hook over their hip, controlling the far hip and the near arm.",
+              "Pull their hip up and off their base with the DLR leg.",
+              "Use the arm control to rotate and off-balance them.",
+              "Sweep by turning them as their balance breaks, into a kimura or armbar.",
+            ],
+            "The DLR sweep uses the outside hook to create the off-balance, matching a wrestler's love of hip and body control. It is a control-based sweep that flows straight into a submission if they defend.",
+            ["Outside hook on the hip","Pull them off base","Rotate to sweep"]
+          ),
+          T("Spider Guard Sweep",
+            "Use feet on the shoulders to create space and trip or sweep a postured top player.",
+            [
+              "Set the spider guard with the feet on the shoulders or forearms.",
+              "Pull the feet to open space and control the arms.",
+              "Trip them as their weight shifts forward.",
+              "Sweep with a hip lift to recover to your guard.",
+            ],
+            "The spider sweep uses foot-and-hand control to make the space a wrestler likes to make with frames. It is safe, active, and opens a direct arm attack after the sweep.",
+            ["Feet on the shoulders","Pull for space","Trip or lift"]
+          ),
+          T("Body Triangle Sweep",
+            "Use the body triangle to control the base and off-balance into a powerful leg-driven sweep.",
+            [
+              "Trap their torso in the body triangle with both legs.",
+              "Use the triangle to control the base and off-balance them.",
+              "Lift and spin with the legs to sweep.",
+              "Finish to your guard or a body lock.",
+            ],
+            "The body triangle sweep is the core of the modern guard-sweep game and a natural extension of a wrestler's body lock. The legs do the work, giving a wrestler a powerful, connected sweep.",
+            ["Legs locked around the torso","Control the base","Lift and spin"]
+          ),
+          T("50/50 / Technical Six Sweep",
+            "Sweep from the 50/50 using the legs on the hips and the wrestler's base.",
+            [
+              "From the 50/50, keep the legs on the hips and frame the chest.",
+              "Off-balance with the body and the legs.",
+              "Sweep with a leg drive or a hip lift.",
+              "Recover to your guard as they turn.",
+            ],
+            "The 50/50 sweep is a wrestler's natural position — the sprawl and body lock turned into a bottom attack. It lets you sweep with the base and leg drive you already have.",
+            ["Legs on the hips","Frame the chest","Leg drive to sweep"]
+          ),
+          T("Inversion / X-Guard Sweep (intro)",
+            "Introduce the inversion: flip over the opponent to off-balance and sweep.",
+            [
+              "From the guard, set up the inversion with one leg over their shoulder.",
+              "Invert over them, keeping the body connected.",
+              "Use the inverted body to off-balance and off-center them.",
+              "Sweep by rolling them as they react.",
+            ],
+            "The inversion is the gateway to the advanced bottom game. For a wrestler, the inverted body control is a new but natural extension of the body lock, opening high-value sweeps and attacks.",
+            ["Invert over them","Stay connected","Off-balance to sweep"]
+          ),
+        ]),
+      TOPIC("Guard Passing",
+        "The top player's game. As a wrestler you already pass by taking them down — now learn to pass on the mat with pressure and position.",
+        [
+          T("Knee Cut Pass",
+            "Split their legs and cut across the body to take the side.",
+            [
+              "Post and drive one knee between their arm and body to split the legs.",
+              "Keep the far leg wide to stop the re-clamp.",
+              "Drive across to side control, controlling the near arm.",
+              "Post and re-establish top posture to maintain pressure.",
+            ],
+            "Knee cutting is the most common pass and a natural extension of a wrestler's ability to split the legs and drive forward. It converts top base into dominant side control.",
+            ["Knee between arm and body","Keep the far leg wide","Drive to side control"]
+          ),
+          T("Technical Pass (Stack Pass)",
+            "Take their posture, stack their hips, and step over to the side.",
+            [
+              "Break their posture by taking the head and pulling them forward.",
+              "Stack their hips onto their shoulders by driving the weight in.",
+              "Step the far leg over their body and drop to side control.",
+              "Post and re-secure to keep the pressure on.",
+            ],
+            "The stack pass uses the same forward pressure and hip drive as a wrestling takedown. For a wrestler, the 'stack' feels like driving someone down, and the finish is a clean side-control pass.",
+            ["Take the posture","Stack the hips","Step over to the side"]
+          ),
+          T("Rush / Body-Lock Pass",
+            "Wrap the body with a body lock and roll them to the side for a pass.",
+            [
+              "Secure the body lock (arm under the arm, leg over the hip).",
+              "Keep their base broken and drive the roll to the side.",
+              "Finish in side control or a mount as they turn.",
+              "Use the body lock to control and prevent the guard re-clamp.",
+            ],
+            "The body-lock pass is pure wrestling: the same body lock and off-balance used in a takedown, applied on the ground. It is high-percentage for a wrestler and hard to defend if the base is broken.",
+            ["Body lock secured","Drive the roll","Finish in side control"]
+          ),
+          T("Passing vs. Closed Guard",
+            "Breaking a closed guard without giving up the top position.",
+            [
+              "Control the head and one arm to prevent the guard from re-clamping.",
+              "Stack the hips or use a knee cut to split the legs.",
+              "Keep the weight forward and the base solid throughout.",
+              "Flow to side control and re-secure before attacking.",
+            ],
+            "Closed guard is the position that stops wrestlers most. Learning to break it is the single biggest top-game upgrade, and it uses the same body control and forward drive you already have.",
+            ["Control head and arm","Split the legs","Keep the base"]
+          ),
+        ]),
+      TOPIC("Back Control Mastery",
+        "The wrestler's most valuable asset is the ability to take the back. Learn to get there, keep it, and finish.",
+        [
+          T("Taking the Back (Body Lock)",
+            "Use a body lock and hip pivot to steal the back from the top or bottom.",
+            [
+              "Secure a deep body lock with the arms and one leg.",
+              "Pivot the hips and drive to rotate them onto their side or chest.",
+              "Thread the arm under the chin as they turn.",
+              "Land on the back with both hooks and go to the rear naked.",
+            ],
+            "Taking the back is the highest-value move in BJJ and a natural extension of a wrestler's body lock and hip drive. Once a wrestler can do this reliably, they have the sport's best position at will.",
+            ["Deep body lock","Pivot the hips","Thread the arm"]
+          ),
+          T("Keeping the Back (Hooks)",
+            "Maintain the back position under pressure — hooks, base, and head control.",
+            [
+              "Keep both hooks deep over the hips and under the armpits.",
+              "Control the head and the base to stop the bridge and spin.",
+              "Stay compact: the tighter you are, the harder they are to escape.",
+              "Use the body weight to prevent them from creating space.",
+            ],
+            "Keeping the back is as important as taking it. A wrestler's base and body control make the hooks strong, but they must be maintained actively or the position is lost in one bridge.",
+            ["Hooks deep and tight","Control the head","Stay compact"]
+          ),
+          T("Escaping the Back",
+            "If you are on the bottom with the back taken, how to recover position.",
+            [
+              "Create space with a bridge, then spin away from their arm.",
+              "Post a hand and shrimp to create the room to turn.",
+              "Use a body lock on them to off-balance and reverse to your guard.",
+              "Stay connected — the goal is a reset, not a panic.",
+            ],
+            "Escaping the back is a must-know survival skill. For a wrestler, the bridge-and-spin uses the same hip power as a sprawl, making the escape very natural.",
+            ["Bridge for space","Spin away from the arm","Body-lock to reverse"]
+          ),
+        ]),
+      TOPIC("Intermediate Submissions",
+        "Add the higher-percentage chokes and arm locks that come from the guard and top systems above.",
+        [
+          T("Omoplata",
+            "A shoulder lock from the guard, combining arm and leg control.",
+            [
+              "Control the arm and bring it across your body.",
+              "Hook the leg around the shoulder and trap the arm with the thigh.",
+              "Rotate to isolate the shoulder and apply pressure.",
+              "Keep the control tight to finish or to off-balance.",
+            ],
+            "The omoplata is a shoulder lock that flows naturally from the arm control a wrestler already does in the grip fight. It is both a submission and a powerful off-balancing tool.",
+            ["Arm across the body","Thigh traps the arm","Rotate to isolate"]
+          ),
+          T("Ezekiel / D'Arce Choke",
+            "A choke from the arm across the neck, reachable from many positions.",
+            [
+              "Cross the arm over the neck and secure the grip.",
+              "Keep the head control and the angle tight.",
+              "Squeeze with the arm and the opposite hand.",
+              "Use it from guard, side, or the top after a body lock.",
+            ],
+            "The D'Arce is one of the most accessible chokes and a natural follow to the body control and arm fights a wrestler loves. It finishes from many positions, making it a versatile addition.",
+            ["Arm over the neck","Tight angle","Squeeze with the arms"]
+          ),
+          T("Kimura (advanced)",
+            "Developing the kimura into a full system of attacks and off-balancing.",
+            [
+              "Maintain the figure-four and rotate the shoulder up and back.",
+              "Use the kimura to off-balance and set up a sweep or armbar.",
+              "Attack the finish by pulling across the chest.",
+              "Chain it to other attacks when they defend.",
+            ],
+            "By blue belt the kimura should be a system, not a single move. For a wrestler, it is the bridge between hand-fighting, off-balancing, and finishing.",
+            ["Figure-four maintained","Off-balance first","Chain the attacks"]
+          ),
+          T("Triangle (advanced)",
+            "Developing the triangle into a control-and-attack system.",
+            [
+              "Maintain the ankle lock and the head control.",
+              "Use the triangle to off-balance and set up a sweep or arm attack.",
+              "Finish by tightening the scissors and keeping the head down.",
+              "Chain to an armbar if they pull the head.",
+            ],
+            "The advanced triangle is a full position, not just a choke. For a wrestler, the leg entanglement and body control make it a dominant bottom game.",
+            ["Ankle and head locked","Off-balance to sweep","Chain the attacks"]
+          ),
+        ]),
+      TOPIC("Wrestler Integration (Blue)",
+        "Systematize the takedown-to-ground flow so every takedown is part of a plan, not a scramble.",
+        [
+          T("Takedown Chains → Ground",
+            "Link takedowns into sweeps and submissions as a continuous sequence.",
+            [
+              "Pick a takedown (e.g., single leg) and a ground follow (e.g., body-lock sweep).",
+              "Drill the chain: takedown → landed position → sweep → attack.",
+              "Add speed and resistance until the chain is smooth.",
+              "Roll the chain as one continuous action.",
+            ],
+            "Chaining takedowns to ground attacks is the wrestler's biggest BJJ advantage. It means you are never 'starting over' on the ground — the takedown is the first link in a chain that ends in a tap.",
+            ["Pick takedown + follow","Drill the chain","Roll as one action"]
+          ),
+          T("Using the Takedown Threat in Guard",
+            "Let the threat of a takedown or body lock dictate your guard play.",
+            [
+              "In your guard, keep the body-lock option live to off-balance them.",
+              "Use the threat to stop their pass and open your attack.",
+              "Flow between the guard attack and the body-lock sweep.",
+            ],
+            "A wrestler in guard has a hidden weapon: the ability to body-lock and sweep. Keeping that threat alive makes the guard more active and the opponent more cautious, opening your real attack.",
+            ["Keep body-lock live","Stop the pass","Flow to attack"]
+          ),
+          T("Sprawl → Offense",
+            "Turn the defensive sprawl into an offensive body lock and attack.",
+            [
+              "Sprawl to defend, then immediately pivot into a body lock.",
+              "Use the body lock to off-balance and sweep or take the back.",
+              "Stay compact and keep the connection through the transition.",
+            ],
+            "Turning a defense (sprawl) straight into offense (body lock, back take) is a hallmark of strong wrestling-based BJJ. It means you are always attacking, even when reacting.",
+            ["Sprawl to defend","Pivot to body lock","Sweep or take the back"]
+          ),
+        ]),
+    ]
+  },
+
+  /* ============================ PURPLE BELT ============================ */
+  {
+    belt:"Purple", title:"Purple Belt",
+    desc:"Refine and connect: full guard systems, pressure-based passing, advanced leg and choke work, and the back-game that makes a wrestler truly dangerous.",
+    children:[
+      TOPIC("Full Guard Systems",
+        "Integrate the guard into a complete, switchable system you can run under pressure.",
+        [
+          T("Guard Switching",
+            "Flow between guard positions without losing the connection or the attack.",
+            [
+              "Learn the common switches: closed → open, DLR → X, spider → closed.",
+              "Keep one leg or hand connected through every switch.",
+              "Use the switch to off-balance and set up the next attack.",
+              "Practice the switches slowly, then at speed.",
+            ],
+            "Guard switching is what separates a guard 'position' from a guard 'game'. For a wrestler, it adds the fluidity that keeps the body-control advantage constant.",
+            ["Keep one connection","Off-balance to switch","Slow, then fast"]
+          ),
+          T("Inverted / Rubber Guard",
+            "Attacking from an inverted position with the body and legs wrapped.",
+            [
+              "Invert over them, keeping the legs hooked and the body connected.",
+              "Use the inverted body lock to off-balance and sweep.",
+              "Flow to a leg entanglement or a choke as they react.",
+              "Stay compact to prevent the escape.",
+            ],
+            "Inverted guard is advanced bottom play that rewards a wrestler's body control and leg drive. It is high-risk, high-reward, and very effective against a top player.",
+            ["Invert and connect","Off-balance with the body","Flow to the attack"]
+          ),
+          T("Body Triangle (Leg Entanglement)",
+            "Using the body triangle to control the base and set up leg or body attacks.",
+            [
+              "Trap the body with both legs in a triangle around the torso.",
+              "Use the triangle to off-balance and control the base.",
+              "Flow to a sweep, a leg entanglement, or a body lock.",
+              "Keep the legs locked to maintain the control.",
+            ],
+            "The body triangle is the core of the modern leg-lock game and a natural extension of a wrestler's body lock. It gives a wrestler a powerful, connected bottom attack.",
+            ["Legs locked around the torso","Off-balance with the base","Flow to the attack"]
+          ),
+        ]),
+      TOPIC("Sweeps (Advanced)",
+        "Inversion and leg-entanglement sweeps — the high-value bottom game that rewards a wrestler's body control and leg drive.",
+        [
+          T("Rubber Guard / Inversion Sweep",
+            "Advanced inverted sweep using the rubber guard and body control to roll a top player.",
+            [
+              "Invert over them with the rubber guard legs hooked.",
+              "Use the inverted body lock to off-balance them.",
+              "Sweep by rolling them as they react.",
+              "Flow to a leg entanglement or a back take.",
+            ],
+            "The rubber guard sweep is high-risk, high-reward advanced bottom play. For a wrestler, the body control and leg drive make it a powerful, dominant sweep against a strong top player.",
+            ["Invert with rubber guard","Off-balance with the body","Flow to the attack"]
+          ),
+          T("Berimbolo / Body Triangle Inversion",
+            "The signature inversion: flip over and into a body triangle for a high-value sweep or leg attack.",
+            [
+              "Set up the inversion with the body triangle.",
+              "Flip over them into the berimbolo position.",
+              "Use the inversion to off-balance and control.",
+              "Sweep or flow to a leg lock.",
+            ],
+            "The berimbolo is the pinnacle of the inversion game and a natural evolution of a wrestler's body lock and leg drive. It is high-value and very effective against a committed top player.",
+            ["Body triangle set up","Flip over them","Off-balance to attack"]
+          ),
+          T("Leg Entanglement Sweep",
+            "Use a leg entanglement to control the base and sweep from the bottom.",
+            [
+              "Establish the leg entanglement from the guard.",
+              "Use the entanglement to control the base and off-balance.",
+              "Sweep with the leg drive.",
+              "Flow to a leg lock or the back.",
+            ],
+            "The leg entanglement sweep is the core of the modern bottom game. For a wrestler, the leg control makes it a powerful, connected sweep that flows straight into the leg-lock game.",
+            ["Entanglement established","Control the base","Flow to the attack"]
+          ),
+          T("Deep Half Guard Sweep",
+            "Sweep from the deep half guard using the safe, connected position as the platform.",
+            [
+              "From deep half, keep the head tucked and the far leg hooked.",
+              "Off-balance with the body and the legs.",
+              "Sweep by rolling them as they commit.",
+              "Recover to your guard or take the back.",
+            ],
+            "The deep half sweep is a safe, high-percentage sweep from the 'I am not in trouble' guard. For a wrestler, it uses the base and body control they already have to reverse the top player.",
+            ["Head tucked, leg hooked","Off-balance with the body","Recover to guard"]
+          ),
+          T("Long Guard / Ashi-Garami Sweep",
+            "Sweep from long guard using the leg entanglement to set the reversal.",
+            [
+              "From long guard, establish the leg entanglement.",
+              "Use the entanglement to off-balance them.",
+              "Sweep with the leg drive.",
+              "Flow to the ashi-garami or a body lock.",
+            ],
+            "The long guard sweep connects the bottom game to the leg-lock game. For a wrestler, it uses the leg control and body drive to sweep and set up the leg lock in the same action.",
+            ["Long guard set up","Entanglement for control","Flow to the attack"]
+          ),
+        ]),
+      TOPIC("Pressure-Based Passing",
+        "Advanced passing that uses weight, base, and position to make the pass nearly impossible to defend.",
+        [
+          T("Weight Passing (Pressure System)",
+            "Using body weight and base to make the pass unbreakable.",
+            [
+              "Distribute the weight to keep the base low and the pressure on.",
+              "Move the pressure in a direction that breaks their base.",
+              "Keep the base solid to prevent the sweep.",
+              "Flow from one pressure point to the next to the pass.",
+            ],
+            "Weight passing is the top player's ultimate weapon and a natural fit for a wrestler who understands base and weight. It makes the pass a position you occupy, not a move you make.",
+            ["Low base, weight on","Break their base","Flow the pressure"]
+          ),
+          T("Knee Cut → Deep Half",
+            "Knee-cutting into the deep half guard and passing from there.",
+            [
+              "Knee-cut to split the legs and control the body.",
+              "Drive to the deep half, controlling the base.",
+              "From deep half, pass to side control or mount.",
+              "Keep the pressure and the base throughout.",
+            ],
+            "Knee-cutting to deep half is a high-percentage pass for a wrestler, using the leg split and body drive they already have to reach a dominant position.",
+            ["Knee-cut the split","Drive to deep half","Pass from there"]
+          ),
+          T("Passing Off a Takedown",
+            "Using the takedown to set up a pass directly.",
+            [
+              "Take the takedown and land in a passing position (knee cut or side).",
+              "Control the body and the base to stop the guard.",
+              "Flow to the pass and then the submission.",
+              "Keep the connection through the whole sequence.",
+            ],
+            "Passing off a takedown is the purest expression of wrestling-based BJJ. The takedown is the entry to the pass, and the pass is the entry to the tap.",
+            ["Land in a passing position","Control the base","Flow to the tap"]
+          ),
+        ]),
+      TOPIC("Leg Lock Game",
+        "The modern high-value game. Learn the entanglements, the attacks, and how to use them as a wrestler.",
+        [
+          T("Ashi-Garami",
+            "A leg entanglement that isolates the knee for the knee lock.",
+            [
+              "Trap the leg in the ashi-garami configuration.",
+              "Control the foot and the knee to isolate the joint.",
+              "Apply the knee lock by hyperextending.",
+              "Keep the control tight to finish or off-balance.",
+            ],
+            "Ashi-garami is the foundation of the leg-lock game and a natural extension of a wrestler's leg and body control. It is high-value and very effective against a top player.",
+            ["Leg trapped","Isolate the knee","Hyperextend to finish"]
+          ),
+          T("Heel Hook (IBJJF-aware)",
+            "The ultimate leg lock — and the rules you must know around it.",
+            [
+              "Isolate the leg and control the foot.",
+              "Rotate the knee to apply the heel hook.",
+              "Know the IBJJF rules: no heel hook from certain positions, and it is an instant win.",
+              "Use it as a high-value threat even when not going for the tap.",
+            ],
+            "The heel hook is the highest-value submission in modern BJJ. For a wrestler, the leg control makes it accessible, and the rules awareness keeps it safe and legal.",
+            ["Isolate the leg","Rotate the knee","Know the rules"]
+          ),
+          T("Knee Bar",
+            "A simple, high-percentage knee lock from the guard or top.",
+            [
+              "Isolate the leg and control the foot.",
+              "Hyperextend the knee to apply the bar.",
+              "Keep the body close and the angle tight.",
+              "Use it as a transitional attack or a finish.",
+            ],
+            "The knee bar is the most learnable leg lock and a great first leg submission for a wrestler. It uses the leg control and body position they already have.",
+            ["Isolate the leg","Hyperextend the knee","Tight angle"]
+          ),
+        ]),
+      TOPIC("Advanced Back Game",
+        "Refine the back take, the back retention, and the chokes to make the back the centerpiece of your game.",
+        [
+          T("Back Take from Takedown",
+            "Taking the back directly off a takedown for an instant high-value finish.",
+            [
+              "Take the takedown and control the body and the head.",
+              "Pivot into the body lock and thread the arm for the back.",
+              "Land on the back with both hooks and go to the choke.",
+              "Keep the connection through the whole sequence.",
+            ],
+            "Taking the back off a takedown is the wrestler's signature finish. It turns a takedown into the highest-value position in the sport in one motion.",
+            ["Control the body and head","Pivot to the back","Go to the choke"]
+          ),
+          T("Back Retention (Advanced)",
+            "Keeping the back under heavy pressure from advanced escapes.",
+            [
+              "Keep the hooks deep and the base solid.",
+              "Control the head and the body to stop the spin.",
+              "Use the body weight to prevent the bridge.",
+              "Re-establish the hooks the instant they open.",
+            ],
+            "Advanced back retention is the difference between a back position you take and one you keep. For a wrestler, the base and body control are the key to holding it.",
+            ["Hooks deep and solid","Control the head","Re-establish fast"]
+          ),
+          T("100% Choke / Body Choke",
+            "A high-percentage choke from the back that works against most defenses.",
+            [
+              "From the back, control the head and the body.",
+              "Thread the arm and apply the choke with the body.",
+              "Keep the angle tight and the squeeze constant.",
+              "Use it as a reliable finish from the back.",
+            ],
+            "The 100% is one of the most reliable chokes from the back. For a wrestler who can get and keep the back, it is a high-percentage finish that rarely misses.",
+            ["Control the head and body","Thread the arm","Constant squeeze"]
+          ),
+        ]),
+      TOPIC("Chain Wrestling & Off-Balance",
+        "The wrestler's core skill, systematized: kuzushi (off-balance) and continuous chains that never let up.",
+        [
+          T("Kuzushi (Off-Balance)",
+            "The principle of breaking balance that underlies every sweep, pass, and submission.",
+            [
+              "Identify the 8 directions of balance and attack one at a time.",
+              "Use the grip, body, and base to pull them off-center.",
+              "Follow the off-balance with the sweep, pass, or attack.",
+              "Keep the off-balance moving so they can't recover.",
+            ],
+            "Off-balance is the single most important principle in BJJ and the wrestler's native language. Mastering kuzushi turns every position into an attack.",
+            ["Attack one direction","Use grip and base","Follow with the attack"]
+          ),
+          T("Continuous Chains",
+            "Never stop: one action flows into the next with no reset.",
+            [
+              "Link takedowns, sweeps, and submissions into continuous sequences.",
+              "Keep the body and the base active through every transition.",
+              "Practice the chains slowly, then at speed, then under resistance.",
+              "Roll the chains as one unbroken action.",
+            ],
+            "Continuous chaining is the hallmark of elite wrestlers in BJJ. It means you are always in motion and always attacking, so the opponent never gets a reset.",
+            ["Link the actions","Stay active","Roll as one action"]
+          ),
+        ]),
+    ]
+  },
+
+  /* ============================ BROWN BELT ============================ */
+  {
+    belt:"Brown", title:"Brown Belt",
+    desc:"Mastery and integration: a unified, switchable game, advanced leg locks, elite back control, and the competition strategy that ties it all together.",
+    children:[
+      TOPIC("Unified Game & Reading",
+        "Integrate every system into one fluid game and develop the ability to read and adapt to any opponent.",
+        [
+          T("Building a Unified Game",
+            "Connecting guard, pass, back, and leg lock into one switchable system.",
+            [
+              "Map how each of your systems links to the others.",
+              "Practice the transitions between systems under pressure.",
+              "Develop a 'default' flow for each position you start from.",
+              "Refine the whole game through competition and rolling.",
+            ],
+            "A unified game is the brown belt's signature: no single position, but a fluid system. For a wrestler, it is the integration of every tool into one continuous expression.",
+            ["Map the links","Drill the transitions","Develop a default flow"]
+          ),
+          T("Reading the Opponent",
+            "Identifying tells, habits, and weaknesses to exploit in real time.",
+            [
+              "Observe the opponent's first move and their recovery habit.",
+              "Identify their strongest and weakest positions.",
+              "Adjust your game to attack the weakness and avoid the strength.",
+              "Stay adaptable — read, then re-read as the match evolves.",
+            ],
+            "Reading is the mental game that separates brown from purple. For a wrestler who already reads levels and shots, it is the natural next step into BJJ strategy.",
+            ["Watch the first move","Find the weakness","Re-read constantly"]
+          ),
+          T("Tempo & Pacing",
+            "Controlling the speed of the match to create openings.",
+            [
+              "Vary the tempo: fast attack, then slow pressure.",
+              "Use the tempo to exhaust the opponent and create openings.",
+              "Match the tempo to the situation and your game.",
+              "Practice the tempo shifts in drilling and rolling.",
+            ],
+            "Tempo is a wrestler's natural tool — the ability to accelerate and decelerate. In BJJ it creates the openings that lead to the high-value finishes.",
+            ["Vary the tempo","Exhaust the opponent","Create the opening"]
+          ),
+        ]),
+      TOPIC("Advanced Leg Lock Game",
+        "The full modern leg-lock system, from entanglement to finish, integrated into the whole game.",
+        [
+          T("Full Ashi-Garami System",
+            "The complete ashi-garami: entry, control, and finish from multiple positions.",
+            [
+              "Develop the ashi-garami from guard, side, and the top.",
+              "Control the foot and the knee to isolate the joint.",
+              "Finish with the knee lock or flow to the heel hook.",
+              "Integrate it into the whole game as a high-value threat.",
+            ],
+            "The full ashi-garami system is the core of the modern leg-lock game. For a wrestler, the leg control and body position make it a natural and dominant addition.",
+            ["Multiple entries","Isolate the joint","Flow to the finish"]
+          ),
+          T("Heel Hook System",
+            "The complete heel hook: entries, defenses, and the rules-aware finish.",
+            [
+              "Develop the heel hook from the entanglements (ashi-garami, body triangle).",
+              "Control the foot and the knee to apply the hook.",
+              "Know the IBJJF rules and the positions where it is allowed.",
+              "Use it as the highest-value threat in the game.",
+            ],
+            "The heel hook is the pinnacle of the leg-lock game and the highest-value submission in BJJ. For a wrestler, it is the ultimate expression of leg control.",
+            ["From the entanglements","Apply the hook","Know the rules"]
+          ),
+          T("Leg Lock Defense",
+            "Defending the leg locks when you are the one with the leg isolated.",
+            [
+              "Recognize the entanglement early and create space.",
+              "Control the foot and the knee to prevent the isolation.",
+              "Shrimp or spin to create the room to escape.",
+              "Stay connected — the goal is a safe reset.",
+            ],
+            "Leg lock defense is a must-know skill at the highest levels. For a wrestler, the body control and base make the defense strong, but it must be trained to be reliable.",
+            ["Recognize early","Control the joint","Create space to reset"]
+          ),
+        ]),
+      TOPIC("Elite Back Control",
+        "The complete back game: taking, keeping, and finishing with elite efficiency.",
+        [
+          T("Taking the Back from Anywhere",
+            "Developing the ability to take the back from guard, side, and the top.",
+            [
+              "Develop the back take from your guard, side control, and the top.",
+              "Use the body lock and hip pivot as the common thread.",
+              "Flow the back take into the choke as one action.",
+              "Make it a default finish from every position.",
+            ],
+            "Taking the back from anywhere is the brown belt's back game. For a wrestler, the body lock and hip pivot are the tools that make it possible from every position.",
+            ["From every position","Body lock + hip pivot","Flow to the choke"]
+          ),
+          T("Back Retention (Elite)",
+            "Keeping the back against the best escapes in the sport.",
+            [
+              "Maintain the hooks and the base under maximum pressure.",
+              "Control the head, the body, and the base simultaneously.",
+              "Re-establish the hooks the instant they open.",
+              "Use the body weight to prevent the spin and bridge.",
+            ],
+            "Elite back retention is the mark of a true back player. For a wrestler, the base and body control are the foundation, but the detail is what holds it under pressure.",
+            ["Hooks, head, and base","Re-establish instantly","Prevent the spin"]
+          ),
+          T("Back Choke System",
+            "The full range of chokes from the back, from the simple to the advanced.",
+            [
+              "Develop the rear naked, 100%, and body chokes as a system.",
+              "Choose the choke based on the defense and the angle.",
+              "Keep the angle tight and the squeeze constant.",
+              "Make the choke a default finish from the back.",
+            ],
+            "The back choke system is the finish to the back game. For a wrestler who can get and keep the back, it is a high-percentage arsenal of finishes.",
+            ["A system of chokes","Choose by the defense","Tight angle, constant squeeze"]
+          ),
+        ]),
+      TOPIC("Sweeps (Elite)",
+        "The complete, integrated sweep game: seamless inversions, full leg-entanglement systems, and continuous reversal chains.",
+        [
+          T("Inversion to Berimbolo (Elite)",
+            "The elite inversion: a seamless transition from guard to berimbolo and the follow-up attack.",
+            [
+              "Develop the inversion as a fluid, automatic action.",
+              "Transition from the guard to the berimbolo without losing the connection.",
+              "Use the inversion to off-balance and control.",
+              "Finish with the sweep or the leg lock.",
+            ],
+            "The elite inversion is the mark of a high-level bottom player. For a wrestler, it is the seamless expression of the body lock and leg drive into the most advanced bottom game.",
+            ["Fluid inversion","Keep the connection","Finish the attack"]
+          ),
+          T("Advanced Leg Entanglement Sweep",
+            "The full leg-entanglement sweep system, workable from multiple positions.",
+            [
+              "Develop the leg entanglement sweep from guard, side, and the bottom.",
+              "Control the base with the entanglement.",
+              "Off-balance and sweep with the legs.",
+              "Flow to the leg lock as a high-value threat.",
+            ],
+            "The advanced leg entanglement sweep is the core of the modern bottom game at the highest level. For a wrestler, it is the full expression of leg control into a dominant sweep.",
+            ["Multiple positions","Control the base","Flow to the leg lock"]
+          ),
+          T("50/50 / Deep Half Elite Sweep",
+            "Elite, high-percentage sweeps from the safe, connected 50/50 and deep half positions.",
+            [
+              "Master the 50/50 and deep half as sweeping platforms.",
+              "Use the connection to off-balance and control.",
+              "Sweep with the base and body drive.",
+              "Recover to a safe position or take the back.",
+            ],
+            "The elite 50/50 and deep half sweep are the safe, high-percentage sweeps of the advanced player. For a wrestler, they are the base and body control expressed as a reliable reversal.",
+            ["Connected and safe","Off-balance with the base","Recover or take the back"]
+          ),
+          T("Continuous Sweep Chains",
+            "Link sweeps into continuous sequences so one reversal flows straight into the next.",
+            [
+              "Chain the guard, the sweep, and the follow-up into one action.",
+              "Keep the body and the base active through every transition.",
+              "Practice the chains slowly, then at speed, then under resistance.",
+              "Roll the chains as one unbroken action.",
+            ],
+            "Continuous sweep chaining is the hallmark of elite wrestlers in BJJ. It means you are always in motion and always attacking, so the opponent never gets a reset.",
+            ["Link the actions","Stay active","Roll as one action"]
+          ),
+          T("Integrated Guard Retention & Sweep",
+            "Use guard retention to set up the sweep — defense that is also offense.",
+            [
+              "Keep the guard connected under pressure.",
+              "Use the retention to off-balance and set the sweep.",
+              "Flow the sweep as the natural continuation.",
+              "Recover to a safe position as they turn.",
+            ],
+            "Integrated guard retention and sweeping means the defense is the setup for the attack. For a wrestler, it is the base and body control expressed as both a safe guard and a powerful reversal.",
+            ["Stay connected","Off-balance to set","Flow to the sweep"]
+          ),
+        ]),
+      TOPIC("Competition Strategy",
+        "The mental and strategic game: planning, adapting, and winning under pressure.",
+        [
+          T("Match Planning",
+            "Preparing a specific plan for each opponent before the match.",
+            [
+              "Study the opponent's habits, strengths, and weaknesses.",
+              "Build a game plan that attacks the weakness and avoids the strength.",
+              "Prepare a 'B plan' for when the main plan is defended.",
+              "Stay flexible — the plan is a guide, not a script.",
+            ],
+            "Match planning is the strategist's edge and the wrestler's natural strength in reading an opponent. It turns a good game into a winning one.",
+            ["Study the opponent","Attack the weakness","Have a B plan"]
+          ),
+          T("Scoring & Rules Strategy",
+            "Playing to the rules: points, positions, and the path to the win.",
+            [
+              "Understand the scoring system (IBJJF or ADCC) inside out.",
+              "Use positions and actions that score to build a lead.",
+              "Protect the lead with safe, controlled play.",
+              "Attack for the tap when the opportunity opens.",
+            ],
+            "Rules strategy is the difference between a good grappler and a competitive one. For a wrestler, it is the application of the same game in a scored context.",
+            ["Know the rules","Score to build a lead","Protect the lead"]
+          ),
+          T("Adapting Under Pressure",
+            "Staying calm and executing when the match is on the line.",
+            [
+              "Develop a pre-match routine to stay centered.",
+              "Trust the training — execute the plan under pressure.",
+              "Stay adaptable — read, then re-read as the match evolves.",
+              "Manage the energy and the tempo across the whole match.",
+            ],
+            "Adapting under pressure is the mental game that decides matches. For a wrestler, the comfort with pressure from competition is a direct transfer to BJJ.",
+            ["Stay centered","Trust the training","Manage the tempo"]
+          ),
+        ]),
+      TOPIC("Wrestler Integration (Brown)",
+        "The complete wrestling-based BJJ game: takedowns, chains, and the integrated expression of every system.",
+        [
+          T("Takedown-to-Tap System",
+            "The full chain from takedown to submission as one continuous, high-percentage system.",
+            [
+              "Link the takedown, the pass, and the submission into one chain.",
+              "Keep the body and the base active through every link.",
+              "Practice the chain under resistance until it is automatic.",
+              "Roll it as one unbroken, high-percentage action.",
+            ],
+            "The takedown-to-tap system is the wrestler's complete BJJ expression. It is the integration of every tool into one continuous, high-percentage path to the finish.",
+            ["One continuous chain","Active body and base","High-percentage finish"]
+          ),
+          T("Integrated Off-Balance",
+            "Using off-balance as the thread that connects every system in the game.",
+            [
+              "Apply kuzushi in the guard, the pass, and the back game.",
+              "Use the off-balance to set up every attack and finish.",
+              "Keep the off-balance moving so the opponent can't reset.",
+              "Make it the default principle of the whole game.",
+            ],
+            "Integrated off-balance is the unifying principle of the brown belt's game. For a wrestler, it is the native language that connects every system into one expression.",
+            ["Kuzushi in every system","Set up every attack","Keep it moving"]
+          ),
+        ]),
+    ]
+  },
+
+  /* ============================ BLACK BELT ============================ */
+  {
+    belt:"Black", title:"Black Belt",
+    desc:"Mastery, innovation, and teaching: a complete, unique game; the ability to read, create, and pass on the art to the next generation.",
+    children:[
+      TOPIC("Complete & Unique Game",
+        "A black belt has a complete game and a unique expression of it. This is the synthesis of everything learned.",
+        [
+          T("Synthesis of All Systems",
+            "Integrating guard, pass, back, and leg lock into one seamless, unique game.",
+            [
+              "Refine every system to its highest expression.",
+              "Connect the systems into one seamless flow.",
+              "Develop the unique expression that is your own.",
+              "Continue to evolve the game through competition and teaching.",
+            ],
+            "The black belt's game is a synthesis of every system into one unique expression. It is the culmination of the wrestler's journey from takedown to tap.",
+            ["Refine every system","One seamless flow","A unique expression"]
+          ),
+          T("Innovation & Creation",
+            "Creating new techniques and sequences that are your own.",
+            [
+              "Identify the gaps in your game and create solutions.",
+              "Develop new sequences and combinations that are unique.",
+              "Test the innovation in competition and rolling.",
+              "Refine and integrate it into the whole game.",
+            ],
+            "Innovation is the mark of a black belt. For a wrestler, it is the creation of new takedown-to-tap sequences that no one else has.",
+            ["Identify the gaps","Create new sequences","Test and refine"]
+          ),
+          T("The Black Belt Game Plan",
+            "A complete, adaptable game plan that works against any opponent.",
+            [
+              "Develop a game plan that adapts to any opponent and any position.",
+              "Have a default flow for every position you start from.",
+              "Refine the plan through competition and teaching.",
+              "Keep the plan flexible and ever-evolving.",
+            ],
+            "The black belt's game plan is complete and adaptable. It is the strategic expression of the complete game, ready for any opponent and any situation.",
+            ["Adapts to any opponent","A default flow for every position","Ever-evolving"]
+          ),
+        ]),
+      TOPIC("Teaching & Mentorship",
+        "Passing on the art: breaking down technique, coaching, and building the next generation.",
+        [
+          T("Breaking Down Technique",
+            "The ability to take any technique and break it into its fundamental parts.",
+            [
+              "Break any technique into its component parts and principles.",
+              "Teach the 'why' before the 'how' so the student understands.",
+              "Build the technique from the fundamentals up.",
+              "Adapt the teaching to the student's level and style.",
+            ],
+            "Breaking down technique is the black belt's teaching skill. For a wrestler, it is the ability to explain the wrestling-based principles behind every BJJ move.",
+            ["Break into parts","Teach the 'why' first","Build from the fundamentals"]
+          ),
+          T("Coaching & Cues",
+            "Giving the right cue at the right time to accelerate a student's learning.",
+            [
+              "Identify the student's level and their specific need.",
+              "Give a clear, simple cue that addresses the issue.",
+              "Adjust the cue as the student improves.",
+              "Build trust so the student can go harder and learn faster.",
+            ],
+            "Coaching is the black belt's way of passing on the art. For a wrestler, it is the transfer of the wrestling-based understanding to the next generation of grapplers.",
+            ["Identify the need","A clear, simple cue","Build trust"]
+          ),
+          T("Building a Curriculum",
+            "Designing a complete training path from white to black belt.",
+            [
+              "Design a curriculum that builds from the fundamentals up.",
+              "Sequence the techniques so each one builds on the last.",
+              "Include the drilling, rolling, and competition for each level.",
+              "Refine the curriculum through teaching and feedback.",
+            ],
+            "Building a curriculum is the black belt's contribution to the art. For a wrestler, it is the design of a complete wrestling-based BJJ path for the next generation.",
+            ["Build from the fundamentals","Sequence the techniques","Refine through teaching"]
+          ),
+        ]),
+      TOPIC("Mental & Long-Term Mastery",
+        "The mental game and the long-term commitment that sustain a black belt's growth.",
+        [
+          T("Flow & Presence",
+            "The state of being fully present and fluid in the match.",
+            [
+              "Develop the ability to be fully present in every exchange.",
+              "Flow between positions and systems without hesitation.",
+              "Stay calm and centered under any pressure.",
+              "Practice the state in drilling, rolling, and competition.",
+            ],
+            "Flow is the black belt's mental state: fully present, fluid, and calm. For a wrestler, it is the natural extension of the pressure and presence built through competition.",
+            ["Fully present","Fluid between systems","Calm under pressure"]
+          ),
+          T("Long-Term Development",
+            "The lifelong commitment to improving the game and the self.",
+            [
+              "Commit to the long-term development of the game and the self.",
+              "Keep learning, teaching, and competing throughout the journey.",
+              "Use the art as a path of personal growth.",
+              "Pass on the knowledge to keep the art alive.",
+            ],
+            "Long-term development is the black belt's commitment. For a wrestler, it is the lifelong pursuit of the perfect expression of the art.",
+            ["A lifelong commitment","Keep learning and teaching","A path of growth"]
+          ),
+          T("The Warrior Mindset",
+            "The mindset of the grappler: discipline, humility, and relentless effort.",
+            [
+              "Develop the discipline to train consistently and at a high level.",
+              "Stay humble — the art is endless, and there is always more to learn.",
+              "Bring relentless effort to every session and every match.",
+              "Lead by example in the gym and in life.",
+            ],
+            "The warrior mindset is the black belt's character. For a wrestler, it is the discipline, humility, and effort that sustain a lifelong pursuit of the art.",
+            ["Consistent discipline","Humble pursuit","Relentless effort"]
+          ),
+        ]),
+      TOPIC("Sweeps (Mastery)",
+        "The sweep as a complete, unique, and ever-evolving game — the unifying thread of the black belt's bottom expression.",
+        [
+          T("Unified Sweep System",
+            "Integrate every sweep into one seamless, switchable system.",
+            [
+              "Map how each sweep links to the others.",
+              "Practice the transitions between sweeps under pressure.",
+              "Develop a default sweep flow for each position.",
+              "Refine the whole system through competition and rolling.",
+            ],
+            "The unified sweep system is the black belt's expression of the bottom game. For a wrestler, it is the integration of every sweep into one continuous, dominant expression.",
+            ["Map the links","Drill the transitions","A default flow"]
+          ),
+          T("Sweeps as a Complete Game",
+            "The sweep as a complete game: entry, control, and finish from any position.",
+            [
+              "Develop the sweep from every position you start from.",
+              "Use the sweep to control and off-balance.",
+              "Finish with the reversal or the attack.",
+              "Make the sweep a default option from every position.",
+            ],
+            "The complete sweep game is the black belt's mastery of the bottom position. For a wrestler, it is the full expression of the base and body control into a dominant, ever-present threat.",
+            ["From every position","Control and off-balance","A default option"]
+          ),
+          T("Reading & Adapting Sweeps",
+            "Read the opponent's top game to choose and adapt the right sweep in real time.",
+            [
+              "Observe the opponent's top position and habit.",
+              "Choose the sweep that exploits their weakness.",
+              "Adjust the sweep as they adapt.",
+              "Stay adaptable — read, then re-read.",
+            ],
+            "Reading is the mental game that elevates the sweep from a move to a strategy. For a wrestler who already reads levels and shots, it is the natural next step into BJJ sweep strategy.",
+            ["Read the top game","Exploit the weakness","Re-read constantly"]
+          ),
+          T("Innovation in Sweeps",
+            "Create new sweeps and sequences that are your own.",
+            [
+              "Identify the gaps in the sweep game.",
+              "Create new sequences and combinations.",
+              "Test the innovation in competition and rolling.",
+              "Refine and integrate it into the whole game.",
+            ],
+            "Innovation is the mark of a black belt. For a wrestler, it is the creation of new takedown-to-sweep sequences that no one else has.",
+            ["Identify the gaps","Create new sequences","Test and refine"]
+          ),
+          T("Sweeps Integrated into the Whole Game",
+            "The sweep as the thread that connects guard, pass, back, and leg lock.",
+            [
+              "Use the sweep to transition between systems.",
+              "Make the sweep a default option from every position.",
+              "Refine the integration through competition and teaching.",
+              "Keep the sweep as a core part of the whole game.",
+            ],
+            "The integrated sweep is the unifying thread of the black belt's game. For a wrestler, it is the native expression of the base and body control that connects every system.",
+            ["A thread between systems","A default option","A core part of the game"]
+          ),
+        ]),
+      TOPIC("Legacy & Contribution",
+        "The black belt's final expression: advancing the art, building community, and cross-pollinating wrestling and BJJ.",
+        [
+          T("Advancing the Art",
+            "Contributing to the growth and evolution of BJJ.",
+            [
+              "Contribute new techniques and systems to the art.",
+              "Mentor and develop the next generation of black belts.",
+              "Share the knowledge widely to grow the art.",
+              "Keep the art evolving through innovation and teaching.",
+            ],
+            "Advancing the art is the black belt's contribution. For a wrestler, it is the cross-pollination of wrestling and BJJ into something new and greater.",
+            ["Contribute new systems","Mentor the next generation","Keep the art evolving"]
+          ),
+          T("Building Community",
+            "Creating a strong, supportive training community.",
+            [
+              "Build a community of training partners who support each other.",
+              "Create a culture of respect, effort, and growth.",
+              "Mentor and uplift the next generation of grapplers.",
+              "Keep the community strong through the art.",
+            ],
+            "Building community is the black belt's social contribution. For a wrestler, it is the creation of a strong wrestling-and-BJJ family.",
+            ["A supportive community","A culture of respect and growth","Uplift the next generation"]
+          ),
+          T("Cross-Pollination (Wrestling × BJJ)",
+            "The unique contribution of a wrestler's BJJ: the fusion of both arts.",
+            [
+              "Bring the wrestling principles (base, off-balance, takedowns) into BJJ.",
+              "Bring the BJJ principles (position, submissions, flow) into wrestling.",
+              "Create a unique fusion that is greater than both arts.",
+              "Pass on the fusion to the next generation of grapplers.",
+            ],
+            "Cross-pollination is the wrestler's unique BJJ contribution: the fusion of wrestling and BJJ into a complete and unique expression of the grappling arts.",
+            ["Wrestling principles into BJJ","BJJ principles into wrestling","A unique fusion"]
+          ),
+        ]),
+    ]
+  },
+  ]
+};
+
+/* ======================= COLORS ======================= */
+const BELT_COLOR = {
+  "White":"#c7d0dd","Blue":"#4f8cff","Purple":"#b07cf7",
+  "Brown":"#e0a35e","Black":"#e7c268","Root":"#e7c268","Skills":"#2fd0ac"
+};
+const BELT_TINT = {
+  "White":"#2a3547","Blue":"#1c2c4a","Purple":"#2a2145","Brown":"#3a2c1c","Black":"#33301f","Root":"#33301f","Skills":"#12302a"
+};
+
+/* ======================= STATE ======================= */
+const state = {
+  activeBelts:new Set(["White","Blue","Purple","Brown","Black"]),
+  selectedId:null,
+  query:"",
+  expanded:new Set(),
+  view:{x:0,y:0,s:1},
+};
+
+/* ======================= USER BUBBLES =======================
+   Bubbles the user adds at runtime. Stored as flat records
+   {uid, parentId, title, desc, how, why, cues} — persisted in
+   localStorage (this device) and, via Export, baked into a copy
+   of this file (same pattern as the video links). */
+const SEED_USER_NODES = /*__SEED_NODES_START__*/[
+]/*__SEED_NODES_END__*/;
+const USER_NODES_KEY="bjjUserNodes_v1";
+const userNodeRecords=(function(){
+  let local=[];
+  try{ local=JSON.parse(localStorage.getItem(USER_NODES_KEY)||"[]")||[]; }catch(e){ local=[]; }
+  const byUid=new Map();
+  (Array.isArray(SEED_USER_NODES)?SEED_USER_NODES:[]).forEach(r=>{ if(r&&r.uid) byUid.set(r.uid,r); });
+  (Array.isArray(local)?local:[]).forEach(r=>{ if(r&&r.uid) byUid.set(r.uid,r); }); // device wins over baked-in
+  return [...byUid.values()];
+})();
+function saveUserNodes(){ try{ localStorage.setItem(USER_NODES_KEY, JSON.stringify(userNodeRecords)); }catch(e){} }
+
+/* Build a flat id map + parent links */
+const NODES = new Map();      // id -> node
+const PARENT = new Map();     // id -> parentId
+function registerNode(n, parent){
+  const base=(parent?parent.__id+"-":"") + String(n.title).replace(/[^\w]+/g,"_");
+  let id=base, k=2;
+  while(NODES.has(id)) id=base+"_"+k++;
+  n.__id=id; n.id=id; n.depth=parent?parent.depth+1:0;
+  NODES.set(id, n);
+  if(parent) PARENT.set(id, parent.id);
+}
+/* ======================= SECOND ROOT — MY SKILLS =======================
+   A personal training tree that sits above the main curriculum. The user
+   drags bubbles from the "BJJ for Wrestlers" tree into it (or onto any
+   bubble inside it); every bubble copied in is a normal user bubble, so
+   adding sub-bubbles, auto-fill, editing and removal behave exactly like
+   the main tree. The "Skills" belt is never affected by the belt filter. */
+const MY_SKILLS = {
+  title: "My Skills",
+  belt: "Skills",
+  desc: "Your personal tree — drag any bubble from the main map onto it to start building the skills you're working on.",
+  children: [],
+};
+function buildTree(n, parent){
+  registerNode(n, parent);
+  (n.children||[]).forEach(c=>buildTree(c,n));
+}
+buildTree(ROOT, null);
+buildTree(MY_SKILLS, null);
+/* Both trees, in map order (My Skills on top) */
+const ROOTS=[MY_SKILLS, ROOT];
+/* Attach user bubbles (from this device, or baked into this file) */
+(function attachUserNodes(records){
+  let remaining=(records||[]).filter(r=>r&&r.uid&&r.parentId);
+  for(;;){
+    const still=[]; let attached=0;
+    for(const r of remaining){
+      const parent=NODES.get(r.parentId);
+      if(!parent){ still.push(r); continue; }
+      const n={
+        title:String(r.title||"Untitled"),
+        desc:String(r.desc==null?"":r.desc),
+        how:Array.isArray(r.how)?r.how.map(s=>String(s)):[],
+        why:String(r.why==null?"":r.why),
+        cues:Array.isArray(r.cues)?r.cues.map(s=>String(s)):[],
+        children:[],
+        __user:true, uid:r.uid,
+      };
+      if(r.belt) n.belt=r.belt;   // keep the original belt colour (white stays white, …)
+      parent.children=parent.children||[];
+      parent.children.push(n);
+      registerNode(n,parent);
+      attached++;
+    }
+    if(!attached) break;      // the rest are orphans (their parent is gone) — drop
+    remaining=still;
+  }
+})(userNodeRecords);
+
+/* ---------- user bubble API ---------- */
+function recordOf(n){ return userNodeRecords.find(r=>r&&r.uid===n.uid); }
+function syncRecord(n){
+  const r=recordOf(n); if(!r) return;
+  r.title=n.title; r.desc=n.desc; r.how=n.how||[]; r.why=n.why||""; r.cues=n.cues||[];
+  saveUserNodes();
+}
+function addChildBubble(parent, title){
+  const uid="u"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  const rec={uid, parentId:parent.id, title:String(title).trim(), desc:"", how:[], why:"", cues:[]};
+  userNodeRecords.push(rec); saveUserNodes();
+  const n={title:rec.title, desc:"", how:[], why:"", cues:[], children:[], __user:true, uid:rec.uid};
+  parent.children=parent.children||[];
+  parent.children.push(n);
+  registerNode(n,parent);
+  return n;
+}
+function removeBubble(n){
+  const ids=new Set();
+  (function w(x){ ids.add(x.id); (x.children||[]).forEach(w); })(n);
+  const uids=new Set();
+  ids.forEach(id=>{ const x=NODES.get(id); if(x&&x.__user) uids.add(x.uid); });
+  const pid=PARENT.get(n.id);
+  if(pid){ const par=NODES.get(pid); if(par) par.children=(par.children||[]).filter(c=>c.id!==n.id); }
+  for(let i=userNodeRecords.length-1;i>=0;i--){ if(uids.has(userNodeRecords[i].uid)) userNodeRecords.splice(i,1); }
+  ids.forEach(id=>{ delete videoLinks[id]; NODES.delete(id); PARENT.delete(id); });
+  saveUserNodes(); saveVideoLinks();
+}
+function refreshBeltCounts(){
+  BELTS.forEach(b=>{
+    const c=document.querySelector(`#belts .chip[data-belt="${b}"] .count`);
+    if(c) c.textContent=countTechniques(b);
+  });
+}
+
+function beltOf(n){
+  let cur=n;
+  while(cur){
+    if(cur.belt) return cur.belt;
+    cur = PARENT.has(cur.id) ? NODES.get(PARENT.get(cur.id)) : null;
+  }
+  return null;
+}
+function isExpanded(n){
+  if(!n.children || n.children.length===0) return false;
+  return state.expanded.has(n.id);
+}
+function setExpanded(n,v){
+  if(!n.children) return;
+  if(v) state.expanded.add(n.id); else state.expanded.delete(n.id);
+}
+function visibleChildren(n){
+  if(!n.children || !isExpanded(n)) return [];
+  return n.children.filter(c=>{
+    if(rootOf(c)===MY_SKILLS) return true;   // the personal tree is never filtered by belt
+    const b=beltOf(c);
+    return b===null || state.activeBelts.has(b);
+  });
+}
+function hasVisibleChildren(n){ return visibleChildren(n).length>0; }
+
+/* ======================= LAYOUT ======================= */
+const M = { cardH:86, vGap:26, hGap:96, nodeW:272, padTop:40, padLeft:40 };
+
+function computeLayout(){
+  // Build the visible trees (respecting expansion + belt filter), stacking
+  // each root's leaf band below the previous one
+  let leafCounter = 0;
+  function assign(n){
+    n.visChildren = visibleChildren(n);
+    if(n.visChildren.length===0){
+      n.ly = leafCounter++;
+    }else{
+      n.visChildren.forEach(assign);
+      const ys = n.visChildren.map(c=>c.ly);
+      n.ly = (Math.min(...ys)+Math.max(...ys))/2;
+    }
+  }
+  ROOTS.forEach(assign);
+  const totalLeaves = Math.max(leafCounter,1);
+  const mapH = totalLeaves*(M.cardH+M.vGap);
+  let maxDepth=0;
+  ROOTS.forEach(r=>{ (function w(n){ if(n.depth>maxDepth) maxDepth=n.depth; n.visChildren.forEach(w); })(r); });
+  const mapW = M.padLeft + (maxDepth+1)*(M.nodeW+M.hGap) + 40;
+  function place(n, parent){
+    n.px = M.padLeft + n.depth*(M.nodeW+M.hGap);
+    n.py = M.padTop + n.ly*(M.cardH+M.vGap);
+    if(parent){
+      const mid = { x:(parent.px+M.nodeW+n.px)/2, y:parent.py+M.cardH/2 };
+      n.edge = `M ${parent.px+M.nodeW} ${parent.py+M.cardH/2} C ${mid.x} ${mid.y}, ${mid.x} ${n.py+M.cardH/2}, ${n.px} ${n.py+M.cardH/2}`;
+    }
+    n.visChildren.forEach(c=>place(c,n));
+  }
+  ROOTS.forEach(r=>place(r,null));
+  return { mapW, mapH };
+}
+
+/* ======================= RENDER ======================= */
+const svg = document.getElementById("svg");
+const viewport = document.getElementById("viewport");
+const NS = "http://www.w3.org/2000/svg";
+function el(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+/* ======================= VIDEO LINKS =======================
+   Each node can have a video link (YouTube, Vimeo, or a direct .mp4/.webm
+   URL) added by the user. Links are saved in localStorage (on this device)
+   and embedded inline when they come from an embeddable source. */
+const VIDEO_KEY="bjjVideoLinks_v1";
+// Links baked into this file (self-contained). "Export" rewrites this block
+// with your current links so a copy of the file carries them with it.
+const SEED_VIDEO_LINKS = /*__SEED_START__*/{
+}/*__SEED_END__*/;
+let videoLinks={};
+(function initVideoLinks(){
+  let local={};
+  try{ local = JSON.parse(localStorage.getItem(VIDEO_KEY)||"{}") || {}; }catch(e){ local={}; }
+  videoLinks = Object.assign({}, SEED_VIDEO_LINKS, local);  // device links override the baked-in ones
+})();
+
+/* ======================= YOUR OWN STEPS =======================
+   Built-in bubbles show their "How to perform" steps read-only, but the
+   user can append their own steps (grip details, drills, cues…). Stored
+   as {nodeId: [step, …]} — same pattern as video links: localStorage
+   on this device, baked into an exported copy via the SEED block. */
+const EXTRA_STEPS_KEY="bjjExtraSteps_v1";
+const SEED_EXTRA_STEPS = /*__SEED_STEPS_START__*/{
+}/*__SEED_STEPS_END__*/;
+let extraSteps={};
+(function initExtraSteps(){
+  let local={};
+  try{ local = JSON.parse(localStorage.getItem(EXTRA_STEPS_KEY)||"{}") || {}; }catch(e){ local={}; }
+  extraSteps = Object.assign({}, SEED_EXTRA_STEPS, local);  // device steps override the baked-in ones
+})();
+function saveExtraSteps(){ try{ localStorage.setItem(EXTRA_STEPS_KEY, JSON.stringify(extraSteps)); }catch(e){} }
+function saveVideoLinks(){ try{ localStorage.setItem(VIDEO_KEY, JSON.stringify(videoLinks)); }catch(e){} }
+function hasVideo(n){ const v=videoLinks[n.id]; return !!(v && String(v).trim()); }
+
+function ytid(u){
+  const m=String(u).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/);
+  return m?m[1]:null;
+}
+function vimeoid(u){
+  const m=String(u).match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  return m?m[1]:null;
+}
+function normalizeUrl(v){
+  v=String(v||"").trim();
+  if(!v) return "";
+  if(!/^https?:\/\//i.test(v)) v="https://"+v;
+  return v;
+}
+function embedHtml(url){
+  const u=normalizeUrl(url);
+  if(!u) return "";
+  const yt=ytid(u); if(yt) return `<iframe src="https://www.youtube-nocookie.com/embed/${yt}" title="Video" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+  const vm=vimeoid(u); if(vm) return `<iframe src="https://player.vimeo.com/video/${vm}" title="Video" allowfullscreen></iframe>`;
+  if(/\.(mp4|webm|ogv|mov)(\?|#|$)/i.test(u)) return `<video controls src="${esc(u)}"></video>`;
+  return "";
+}
+function renderVideo(n){
+  const url = videoLinks[n.id] || "";
+  const embed = embedHtml(url);
+  return `<div class="sec">
+    <div class="lbl"><span class="ico" style="--c:var(--accent)">▶</span>Video link</div>
+    <div class="videoRow">
+      <input type="text" class="videoInput" id="videoInput" value="${esc(url)}" placeholder="Paste a YouTube, Vimeo, or direct .mp4 link…" spellcheck="false" autocomplete="off"/>
+      <button class="btn primary" data-act="saveVideo">Save</button>
+      <button class="btn" data-act="clearVideo" ${url?"":"disabled"}>Clear</button>
+    </div>
+    ${url?`<a class="videoOpen" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Open video in a new tab ↗</a>`:""}
+    ${embed?`<div class="videoEmbed">${embed}</div>`:""}
+    ${url&&!embed?`<div class="videoNote">This link can't be embedded inline, so use "Open in a new tab" to watch it.</div>`:""}
+    ${!url?`<div class="videoNote">Add a link to attach a video to this technique — it's saved on this device and appears here next time.</div>`:""}
+  </div>`;
+}
+
+/* ======================= AUTO-FILL (Ollama) =======================
+   When a bubble is added, its heading (plus the parent context) is
+   sent to the Ollama server and the model drafts the overview,
+   "how to perform", "why it works" and cues as JSON. The page must
+   be served over http:// (Run_App.bat) — the Ollama server rejects
+   requests from file:// pages (Origin: null). */
+const AI_KEY="bjjAI_v1";
+let aiSettings=(function(){
+  const d={endpoint:"http://192.168.2.88:11434", model:"qwen3.8:latest"};
+  try{ const s=JSON.parse(localStorage.getItem(AI_KEY)||"null"); if(s&&s.endpoint) d=Object.assign(d,s); }catch(e){}
+  return d;
+})();
+function saveAISettings(){ try{ localStorage.setItem(AI_KEY, JSON.stringify(aiSettings)); }catch(e){} }
+let aiBusyUid=null;
+const aiStatus=new Map();  // uid -> {ok, msg}
+
+function aiEndpoint(){ return (aiSettings.endpoint||"").replace(/\/+$/,"").trim(); }
+function aiExtractJson(text){
+  let t=String(text||"").replace(/^\uFEFF/,"").trim();
+  t=t.replace(/^```(?:json)?\s*/i,"").replace(/```$/,"").trim();
+  const m=t.match(/\{[\s\S]*\}/);
+  if(m) t=m[0];
+  return JSON.parse(t);
+}
+function aiNormalize(o){
+  const pick=(...ks)=>{ for(const k of ks){ if(o[k]!=null && o[k]!=="") return o[k]; } return null; };
+  const overview=String(pick("overview","desc","description","summary")||"").trim();
+  let how=pick("how","steps","howToPerform","instructions");
+  if(typeof how==="string") how=[how];
+  how=Array.isArray(how)?how.map(s=>String(s).trim()).filter(Boolean):[];
+  const why=String(pick("why","whyItWorks","reason")||"").trim();
+  let cues=pick("cues","tips","keyPoints","key_points");
+  if(typeof cues==="string") cues=cues.split(/[,;\n]/);
+  cues=Array.isArray(cues)?cues.map(s=>String(s).trim()).filter(Boolean):[];
+  return {overview, how, why, cues};
+}
+function aiErrorText(e){
+  const m=String((e&&e.message)||e);
+  if((e&&e.name==="TimeoutError")||/timed? ?out/i.test(m))
+    return "Timed out waiting for the model — it may still be loading. Wait a moment and try again.";
+  if(/HTTP 403/i.test(m))
+    return "The Ollama server rejected the browser (HTTP 403 — CORS). It only allows http:// pages, so start the app with Run_App.bat (http://127.0.0.1) and try again.";
+  if(/fetch|network|failed/i.test(m))
+    return "Couldn't reach "+aiEndpoint()+" — is the Ollama server running? (Launch_Claude_Ollama.bat)";
+  return m;
+}
+async function aiListModels(){
+  const r=await fetch(aiEndpoint()+"/api/tags", {signal:AbortSignal.timeout(5000)});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  const j=await r.json();
+  return (j.models||[]).map(m=>m.name);
+}
+async function aiDraft(heading, context){
+  const prompt=[
+    "You are writing ONE card for a Brazilian Jiu-Jitsu (BJJ) training mind map written for wrestlers.",
+    "Style: practical, position-first, plain English, no fluff.",
+    `New bubble heading: "${heading}"`,
+    `It is attached under: "${context}"`,
+    "Return ONLY a JSON object (no markdown, no comments) with exactly these keys:",
+    '{"overview":"1-2 sentences: what it is and when to use it",',
+    '"how":["3 to 5 concrete action steps, in order"],',
+    '"why":"1-2 sentences: the underlying principle — why it works for a wrestler",',
+    '"cues":["3 to 4 short memorable training cues"]}',
+  ].join("\n");
+  const r=await fetch(aiEndpoint()+"/api/generate", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:aiSettings.model, prompt, stream:false, think:false, format:"json", options:{temperature:0.4}}),
+    signal:AbortSignal.timeout(180000),
+  });
+  if(!r.ok) throw new Error("Ollama answered HTTP "+r.status);
+  const j=await r.json();
+  let obj=null;
+  if(j.response){ try{ obj=aiExtractJson(j.response); }catch(e){ obj=null; } }
+  if(!obj && j.thinking){ try{ obj=aiExtractJson(j.thinking); }catch(e){ obj=null; } }
+  if(!obj) throw new Error("The model returned no readable content — try again, or check the model name.");
+  return aiNormalize(obj);
+}
+async function runAutoFill(n){
+  if(aiBusyUid) return;
+  aiBusyUid=n.uid;
+  aiStatus.delete(n.uid);
+  select(n); render();
+  const parent=NODES.get(PARENT.get(n.id));
+  const crumbTxt=parent?crumb(parent):"";
+  const context=parent? (parent.title+(crumbTxt?" — "+crumbTxt:"")) : "the root of the map";
+  try{
+    const data=await aiDraft(n.title, context);
+    if(!data.overview && !data.how.length) throw new Error("The model returned an empty card — try again or check the model name.");
+    n.desc=data.overview; n.how=data.how; n.why=data.why; n.cues=data.cues;
+    syncRecord(n);
+    aiStatus.set(n.uid,{ok:true,msg:`Drafted from “${n.title}” with ${aiSettings.model}. Edit any field below, or re-draft.`});
+  }catch(e){
+    aiStatus.set(n.uid,{ok:false,msg:aiErrorText(e)});
+  }
+  aiBusyUid=null;
+  if(state.selectedId===n.id || !state.selectedId){ select(n); }
+  render();
+  refreshBeltCounts();
+}
+
+function matches(n){
+  if(!state.query) return true;
+  const q=state.query.toLowerCase();
+  if(n.title.toLowerCase().includes(q)||(n.desc||"").toLowerCase().includes(q)) return true;
+  return (n.children||[]).some(matches);
+}
+
+function render(){
+  const {mapW,mapH}=computeLayout();
+  viewport.innerHTML="";
+  viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
+  const q=state.query;
+  // Edges first (both trees)
+  ROOTS.forEach(r=>{
+    (function walk(n){
+      n.visChildren.forEach(c=>{
+        const e=el("path",{class:"edge",d:c.edge});
+        viewport.appendChild(e);
+        c._edge=e;
+        walk(c);
+      });
+    })(r);
+  });
+  // Nodes (both trees)
+  ROOTS.forEach(r=>{
+    (function walk(n){
+      const inMain = rootOf(n)===ROOT;
+      const g=el("g",{class:"node depth"+n.depth+(state.selectedId===n.id?" selected":"")+(q&&!matches(n)?" dim":"")+(inMain?" draggable":"")});
+      g.setAttribute("data-id",n.id);
+      g.setAttribute("data-tree",inMain?"main":"skills");
+      const belt = n.belt || (n.depth===0?"Root":beltOf(n));
+      const color = BELT_COLOR[belt]||"#888";
+      const tint  = BELT_TINT[belt]||"#223049";
+      g.style.setProperty("--belt",color);
+      g.style.setProperty("--card",tint);
+      const x=n.px,y=n.py;
+      const card=el("rect",{class:"card",x,y,width:M.nodeW,height:M.cardH,rx:14,ry:14});
+      const accent=el("rect",{class:"accent",x:x+1,y:y+10,width:5,height:M.cardH-20,rx:2.5,ry:2.5});
+      const dotColor=hasVideo(n)?"#3ecf8e":"#a855f7";
+      const dot=el("circle",{class:"vdot",cx:x+M.nodeW-14,cy:y+15,r:6,fill:dotColor,stroke:"#0b0f17","stroke-width":1.5});
+      g.appendChild(card);g.appendChild(accent);g.appendChild(dot);
+
+      // foreignObject content
+      const fo=el("foreignObject",{x:x,y:y,width:M.nodeW,height:M.cardH});
+      const div=document.createElementNS("http://www.w3.org/1999/xhtml","div");
+      div.setAttribute("class","cardInner");
+      div.style.cssText="width:100%;height:100%;padding:11px 13px;overflow:hidden";
+      let more="";
+      if(n.children && n.children.length){
+        more = isExpanded(n) ? "▾ "+n.children.length : "▸ "+n.children.length;
+      }
+      div.innerHTML =
+        `<div class="row">`+
+          (belt?`<span class="pill"><span class="dot"></span>${belt.toUpperCase()}</span>`:"")+
+          `<span class="more">${esc(more)}</span>`+
+        `</div>`+
+        `<p class="t">${esc(n.title)}</p>`+
+        `<p class="d">${esc(n.desc)}</p>`;
+      fo.appendChild(div);
+      g.appendChild(fo);
+      g.addEventListener("click",(ev)=>{ev.stopPropagation(); if(suppressClick){suppressClick=false;return;} onNodeClick(n);});
+      if(inMain) initNodeDrag(n,g);
+      viewport.appendChild(g);
+      n._g=g;
+      n.visChildren.forEach(c=>walk(c));
+    })(r);
+  });
+  updateStat();
+}
+
+function updateStat(){
+  const total=[...NODES.values()].length;
+  const vis=visibleCount();
+  document.getElementById("stat").textContent=`${vis} of ${total} nodes shown`;
+}
+function visibleCount(){
+  let c=0;
+  ROOTS.forEach(r=>{ (function w(n){c++;n.visChildren.forEach(w);})(r); });
+  return c;
+}
+
+/* ======================= INTERACTION ======================= */
+function onNodeClick(n){
+  // toggle expansion if it has children
+  if(n.children && n.children.length){
+    setExpanded(n, !isExpanded(n));
+    // also expand ancestors so the path stays visible
+    let p=PARENT.get(n.id);
+    while(p){ setExpanded(NODES.get(p),true); p=PARENT.get(p); }
+  }
+  select(n);
+  render();
+}
+/* Mobile bottom-sheet behaviour for the detail panel */
+const detailPanel=document.querySelector(".detail");
+function openMobileDetail(){ if(detailPanel) detailPanel.classList.add("open"); }
+function closeMobileDetail(){ if(detailPanel) detailPanel.classList.remove("open"); }
+function select(n){
+  state.selectedId=n.id;
+  renderDetail(n);
+  openMobileDetail();
+}
+
+/* ======================= DRAG → MY SKILLS =======================
+   Pointer-based drag (mouse + touch). Press and drag a bubble from the
+   main map: a ghost card follows the pointer, the My Skills tree lights
+   up as drop targets, and a preview line shows the connection that will
+   be made. Dropping copies the bubble — with its whole subtree — under
+   the target as normal user bubbles, so it connects with a line exactly
+   like the rest of the tree, and its own sub-bubbles, editing,
+   auto-fill and video links all work. The original stays untouched. */
+let suppressClick=false;   // swallows the click that would follow a completed drag
+function rootOf(n){ let cur=n; while(PARENT.has(cur.id)) cur=NODES.get(PARENT.get(cur.id)); return cur; }
+function skillsNodes(){
+  const out=[];
+  (function w(x){ out.push(x); (x.children||[]).forEach(w); })(MY_SKILLS);
+  return out;
+}
+function subtreeCount(n){ let c=0; (function w(x){ (x.children||[]).forEach(ch=>{ c++; w(ch); }); })(n); return c; }
+function makeCopyUnder(parent, src){
+  // Copy src (and its subtree) as user-bubble records under parent.
+  // Built-in steps + the user's own extra steps + video link + the
+  // original belt colour all travel along (white stays white, blue stays blue).
+  const uid="u"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  const how=(src.how||[]).concat(extraSteps[src.id]||[]);
+  const rec={
+    uid, parentId:parent.id,
+    title:String(src.title), desc:String(src.desc||""),
+    how:how.map(s=>String(s)), why:String(src.why||""),
+    cues:(src.cues||[]).map(s=>String(s)),
+    belt:beltOf(src)||null,
+  };
+  userNodeRecords.push(rec);
+  const n={title:rec.title, desc:rec.desc, how:rec.how, why:rec.why, cues:rec.cues, children:[], __user:true, uid:rec.uid};
+  if(rec.belt) n.belt=rec.belt;
+  parent.children=parent.children||[];
+  parent.children.push(n);
+  registerNode(n,parent);
+  if(videoLinks[src.id]) videoLinks[n.id]=String(videoLinks[src.id]);
+  (src.children||[]).forEach(c=>makeCopyUnder(n,c));
+  return n;
+}
+function copyToSkills(src, target){
+  const fresh=makeCopyUnder(target,src);
+  saveUserNodes(); saveVideoLinks();
+  state.expanded.add(target.id);
+  ensurePath(target);
+  select(fresh);
+  render();
+  return fresh;
+}
+function dropTargetAt(x,y){
+  const e=document.elementFromPoint(x,y);
+  const gEl=e&&e.closest?e.closest(".node"):null;
+  if(!gEl || gEl.getAttribute("data-tree")!=="skills") return null;
+  return NODES.get(gEl.getAttribute("data-id"))||null;
+}
+function initNodeDrag(n,g){
+  g.addEventListener("pointerdown",e=>{
+    if(e.pointerType==="mouse" && e.button!==0) return;
+    e.stopPropagation();                    // don't start a map pan from a node press
+    const sx=e.clientX, sy=e.clientY;
+    let active=false, hover=null, line=null;
+    // ghost card
+    const ghost=document.createElement("div");
+    ghost.className="dragGhost";
+    const cnt=subtreeCount(n);
+    const gt=document.createElement("div"); gt.className="t"; gt.textContent=n.title;
+    const gs=document.createElement("div"); gs.className="s";
+    gs.textContent = cnt ? cnt+" bubble"+(cnt>1?"s":"")+" under it will come along" : "Drop on a highlighted bubble in My Skills";
+    ghost.appendChild(gt); ghost.appendChild(gs);
+    document.body.appendChild(ghost);
+    function placeGhost(ev){
+      ghost.style.display="block";
+      ghost.style.left=ev.clientX+"px";
+      ghost.style.top=ev.clientY+"px";
+    }
+    function updateLine(){
+      if(!line) return;
+      if(!hover){ line.setAttribute("d",""); return; }
+      const x1=n.px+M.nodeW, y1=n.py+M.cardH/2;
+      const x2=hover.px, y2=hover.py+M.cardH/2;
+      const mx=(x1+x2)/2;
+      line.setAttribute("d",`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    }
+    function setHover(t){
+      if(t===hover) return;
+      if(hover&&hover._g) hover._g.classList.remove("dropover");
+      hover=t;
+      if(hover&&hover._g) hover._g.classList.add("dropover");
+      updateLine();
+    }
+    function activate(ev){
+      active=true;
+      placeGhost(ev);
+      document.body.classList.add("dragging");
+      skillsNodes().forEach(x=>{ if(x._g) x._g.classList.add("dropok"); });
+      line=el("path",{class:"edge dragline"});
+      viewport.appendChild(line);
+    }
+    function onMove(ev){
+      if(!active){
+        if(Math.hypot(ev.clientX-sx,ev.clientY-sy)<8) return;   // small jitter = still a click
+        activate(ev);
+      }
+      placeGhost(ev);
+      setHover(dropTargetAt(ev.clientX,ev.clientY));
+    }
+    function onUp(ev){
+      window.removeEventListener("pointermove",onMove);
+      window.removeEventListener("pointerup",onUp);
+      window.removeEventListener("pointercancel",onUp);
+      if(!active){ ghost.remove(); return; }                    // plain click — let it through
+      const target=dropTargetAt(ev.clientX,ev.clientY);
+      ghost.remove();
+      if(line) line.remove();
+      document.body.classList.remove("dragging");
+      skillsNodes().forEach(x=>{ if(x._g) x._g.classList.remove("dropok","dropover"); });
+      suppressClick=true; setTimeout(()=>{suppressClick=false;},0);
+      if(target) copyToSkills(n,target);
+    }
+    window.addEventListener("pointermove",onMove);
+    window.addEventListener("pointerup",onUp);
+    window.addEventListener("pointercancel",onUp);
+  });
+}
+
+/* ---------- Detail panel ---------- */
+const detailInner=document.getElementById("detailInner");
+function renderAddBox(n){
+  return `<div class="sec addbox">
+    <div class="lbl"><span class="ico" style="--c:var(--accent)">+</span>Add a bubble under “${esc(n.title)}”</div>
+    <div class="addrow">
+      <input id="newBubbleTitle" class="videoInput" type="text" placeholder="Heading for the new bubble (e.g. 'De La Riva Sweep')" autocomplete="off" spellcheck="false"/>
+      <button class="btn primary" data-act="addBubble">Add ✦</button>
+    </div>
+    <div class="videoNote">It inherits this bubble's belt and style, and the app drafts its overview, how-to and why from the heading.</div>
+  </div>`;
+}
+function renderAutoFillBox(n){
+  const busy = aiBusyUid===n.uid;
+  const st = aiStatus.get(n.uid);
+  let status="";
+  if(busy) status=`<div class="statusline busy">⟳ Drafting “${esc(n.title)}” from the heading — the first run can take a minute while the model loads…</div>`;
+  else if(st) status=`<div class="statusline ${st.ok?"ok":"err"}">${st.ok?"✓ ":"✕ "}${esc(st.msg)}</div>`;
+  else status=`<div class="statusline busy">No draft saved for this bubble yet — press “⟳ Re-draft from heading”, or type the overview / how / why sections by hand.</div>`;
+  return `<div class="sec aibox">
+    <div class="lbl"><span class="ico" style="--c:var(--gold)">✦</span>Auto-fill from heading</div>
+    ${status}
+    <div class="addrow">
+      <button class="btn" data-act="regen" ${busy?"disabled":""}>${busy?"Working…":"⟳ Re-draft from heading"}</button>
+      <span class="hintinline">Edit the heading above first to change what it drafts.</span>
+    </div>
+    <details class="aiset">
+      <summary>⚙ Search server (Ollama) — ${esc(aiEndpoint())} · ${esc(aiSettings.model)}</summary>
+      <div class="addrow"><input id="aiEndpoint" class="videoInput" type="text" value="${esc(aiSettings.endpoint)}" spellcheck="false" autocomplete="off" placeholder="http://server:11434"/></div>
+      <div class="addrow">
+        <input id="aiModel" class="videoInput" type="text" value="${esc(aiSettings.model)}" list="aiModels" spellcheck="false" placeholder="model name"/>
+        <datalist id="aiModels"></datalist>
+        <button class="btn" data-act="loadModel">Load models</button>
+      </div>
+      <div class="videoNote">Auto-fill calls the Ollama API on your LAN server. Start the app with Run_App.bat so it runs from http://127.0.0.1 — a file:// page is rejected by the server. Settings are saved on this device.</div>
+    </details>
+  </div>`;
+}
+function renderDetail(n){
+  const belt = n.belt || (n.depth===0?null:beltOf(n));
+  const color = BELT_COLOR[belt]||"var(--accent)";
+  const children = n.children||[];
+  const isUser = !!n.__user;
+  let html="";
+  if(n.depth>0){
+    html+=`<div class="backbtn btn" data-act="back">← Back to ${esc(parentName(n))}</div>`;
+  }
+  html+=`<div class="head">`;
+  if(belt) html+=`<div class="beltline"><span class="beltbadge" style="--belt:${color};background:${color}">${belt.toUpperCase()}</span><span class="crumb">${crumb(n)}</span></div>`;
+  if(isUser){
+    html+=`<input id="editTitle" class="titleinput" type="text" value="${esc(n.title)}" spellcheck="false" autocomplete="off"/>`;
+  }else{
+    html+=`<h2>${esc(n.title)}</h2>`;
+  }
+  html+=`</div>`;
+  html+=`<div class="body">`;
+  if(isUser) html+=`<span id="savedFlash" class="savedflash">Saved ✓</span>`;
+  html+=renderAddBox(n);
+  if(isUser) html+=renderAutoFillBox(n);
+  html+=renderVideo(n);
+  html+=`<div class="sec"><div class="lbl"><span class="ico" style="--c:var(--accent)">i</span>Overview</div>`;
+  if(isUser){
+    html+=`<textarea id="editOverview" class="editbox" rows="3" placeholder="What is this, and when do you use it?">${esc(n.desc||"")}</textarea>`;
+  }else{
+    html+=`<div class="descbox">${esc(n.desc||"")}</div>`;
+  }
+  html+=`</div>`;
+
+  if(children.length){
+    const listLabel = belt==="Skills" ? "Bubbles" : (n.depth===0 ? "Belts" : (n.depth===1 ? "Topics" : "Techniques"));
+    html+=`<div class="sec"><div class="lbl"><span class="ico" style="--c:${color}">▸</span>${listLabel} (${children.length})</div><div class="children">`;
+    children.forEach((c,i)=>{
+      html+=`<div class="childrow" data-id="${c.id}">
+        <div class="num">${i+1}</div>
+        <div><div class="ct">${esc(c.title)}</div><div class="cd">${esc(c.desc)}</div></div>
+        <div class="go">›</div></div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  // Content: always editable for user bubbles; built-in nodes show it
+  // whenever they have it — even after the user adds a bubble under them.
+  // Built-in steps can also be extended with your own steps.
+  if(isUser || (n.how && n.how.length)){
+      html+=`<div class="sec"><div class="lbl"><span class="ico" style="--c:var(--ok)">1</span>How to perform <span class="hintinline">${isUser?"one step per line":""}</span></div>`;
+      if(isUser){
+        html+=`<textarea id="editHow" class="editbox" rows="5" placeholder="1. First step
+2. Second step
+3. …">${(n.how||[]).map(esc).join("\n")}</textarea>`;
+      }else{
+        const extra=extraSteps[n.id]||[];
+        html+=`<ol class="steps">`;
+        n.how.forEach(s=>html+=`<li>${esc(s)}</li>`);
+        extra.forEach((s,i)=>{
+          html+=`<li class="yours">${esc(s)}<button class="steprmv" data-act="delStep" data-i="${i}" title="Remove this step">✕</button></li>`;
+        });
+        html+=`</ol>`;
+        html+=`<div class="addrow">
+          <input id="newStep" class="videoInput" type="text" placeholder="Add your own step — a grip detail, a drill, a partner cue…" autocomplete="off" spellcheck="false"/>
+          <button class="btn primary" data-act="addStep">Add step</button>
+        </div>`;
+        html+=`<div class="videoNote">Steps you add are yours: saved on this device, numbered after the built-in steps, and carried along if you drag this bubble into My Skills. The ✕ removes your step — the built-in ones stay.</div>`;
+      }
+      html+=`</div>`;
+    }
+    if(isUser || n.why){
+      html+=`<div class="sec"><div class="lbl"><span class="ico" style="--c:var(--gold)">★</span>Why it works</div>`;
+      if(isUser){
+        html+=`<textarea id="editWhy" class="editbox" rows="3" placeholder="The principle behind it — why it works for a wrestler.">${esc(n.why||"")}</textarea>`;
+      }else{
+        html+=`<div class="whybox">${esc(n.why)}</div>`;
+      }
+      html+=`</div>`;
+    }
+    if(isUser || (n.cues && n.cues.length)){
+      html+=`<div class="sec"><div class="lbl"><span class="ico" style="--c:var(--accent)">✓</span>Cues <span class="hintinline">${isUser?"one cue per line":""}</span></div>`;
+      if(isUser){
+        html+=`<textarea id="editCues" class="editbox" rows="3" placeholder="Short memorable reminders.">${(n.cues||[]).map(esc).join("\n")}</textarea>`;
+      }else{
+        html+=`<div class="cues">`;
+        n.cues.forEach(c=>html+=`<span class="cue">${esc(c)}</span>`);
+        html+=`</div>`;
+      }
+      html+=`</div>`;
+  }
+
+  if(isUser){
+    html+=`<div class="sec"><button class="btn danger" data-act="removeBubble">Remove this bubble</button> <span class="videoNote">Removes this bubble and any bubbles added under it — original content is untouched.</span></div>`;
+  }
+  html+=`</div>`;
+  html+=`<div class="foot">Wrestler's perspective · position before submission · the takedown is the first link in the chain to the tap.</div>`;
+  detailInner.innerHTML=html;
+  wireDetail(n, isUser);
+}
+function wireDetail(n, isUser){
+  // wire the video link (add / save / clear, persisted on this device)
+  const vInput=detailInner.querySelector("#videoInput");
+  const vSave=detailInner.querySelector('[data-act="saveVideo"]');
+  const vClear=detailInner.querySelector('[data-act="clearVideo"]');
+  if(vSave&&vInput) vSave.addEventListener("click",()=>{
+    const v=normalizeUrl(vInput.value);
+    if(v) videoLinks[n.id]=v; else delete videoLinks[n.id];
+    saveVideoLinks(); select(n); render();
+  });
+  if(vInput) vInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); if(vSave) vSave.click(); } });
+  if(vClear) vClear.addEventListener("click",()=>{
+    delete videoLinks[n.id]; saveVideoLinks(); select(n); render();
+  });
+  // wire child rows
+  detailInner.querySelectorAll(".childrow").forEach(r=>{
+    r.addEventListener("click",()=>{ const c=NODES.get(r.dataset.id); ensurePath(c); select(c); render(); });
+  });
+  const back=detailInner.querySelector('[data-act="back"]');
+  if(back) back.addEventListener("click",()=>{ const p=NODES.get(PARENT.get(n.id)); if(p){ensurePath(p);select(p);render();} });
+
+  // add a bubble under this one
+  const addInput=detailInner.querySelector("#newBubbleTitle");
+  const addBtn=detailInner.querySelector('[data-act="addBubble"]');
+  if(addBtn&&addInput){
+    const doAdd=()=>{
+      const t=addInput.value.trim();
+      if(!t){ addInput.focus(); return; }
+      const child=addChildBubble(n, t);
+      state.expanded.add(n.id);
+      ensurePath(child);
+      select(child); render();
+      runAutoFill(child);   // auto-draft overview / how / why from the heading
+    };
+    addBtn.addEventListener("click",doAdd);
+    addInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); doAdd(); } });
+  }
+
+  // your own steps on built-in bubbles (add / remove; persisted on this device)
+  const stepInput=detailInner.querySelector("#newStep");
+  const stepBtn=detailInner.querySelector('[data-act="addStep"]');
+  if(stepBtn&&stepInput){
+    const doAdd=()=>{
+      const v=stepInput.value.trim();
+      if(!v){ stepInput.focus(); return; }
+      if(!extraSteps[n.id]) extraSteps[n.id]=[];
+      extraSteps[n.id].push(v);
+      saveExtraSteps();
+      select(n);    // re-render the panel with the new step in the list
+    };
+    stepBtn.addEventListener("click",doAdd);
+    stepInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); doAdd(); } });
+  }
+  detailInner.querySelectorAll('[data-act="delStep"]').forEach(b=>{
+    b.addEventListener("click",ev=>{
+      ev.stopPropagation();
+      const arr=extraSteps[n.id]; if(!arr) return;
+      arr.splice(Number(b.dataset.i),1);
+      if(!arr.length) delete extraSteps[n.id];
+      saveExtraSteps();
+      select(n);
+    });
+  });
+
+  if(!isUser) return;
+
+  // auto-fill controls
+  const regen=detailInner.querySelector('[data-act="regen"]');
+  if(regen) regen.addEventListener("click",()=>runAutoFill(n));
+  const ep=detailInner.querySelector("#aiEndpoint");
+  const mo=detailInner.querySelector("#aiModel");
+  const saveSet=()=>{
+    if(ep) aiSettings.endpoint=ep.value.trim()||"http://192.168.2.88:11434";
+    if(mo) aiSettings.model=mo.value.trim()||"qwen3.8:latest";
+    saveAISettings();
+  };
+  if(ep) ep.addEventListener("change",saveSet);
+  if(mo) mo.addEventListener("change",saveSet);
+  const lm=detailInner.querySelector('[data-act="loadModel"]');
+  if(lm) lm.addEventListener("click",async ()=>{
+    saveSet();
+    lm.disabled=true; const old=lm.textContent; lm.textContent="Loading…";
+    try{
+      const models=await aiListModels();
+      const dl=detailInner.querySelector("#aiModels");
+      if(dl) dl.innerHTML=models.map(m=>`<option value="${esc(m)}">`).join("");
+      if(models.length && !models.includes(aiSettings.model)){ aiSettings.model=models[0]; saveAISettings(); }
+      if(mo) mo.value=aiSettings.model;
+    }catch(e){
+      alert("Couldn't reach "+aiSettings.endpoint+" — is Ollama running?\n\n"+String((e&&e.message)||e));
+    }
+    lm.disabled=false; lm.textContent=old;
+  });
+
+  // editable fields (auto-save; overview/title also refresh the bubble card)
+  const flash=()=>{
+    const f=detailInner.querySelector("#savedFlash");
+    if(!f) return;
+    f.classList.add("show");
+    clearTimeout(f._t); f._t=setTimeout(()=>f.classList.remove("show"),1200);
+  };
+  const bind=(id, apply, alsoRender)=>{
+    const t=detailInner.querySelector(id); if(!t) return;
+    let tmr=null;
+    t.addEventListener("input",()=>{
+      clearTimeout(tmr);
+      tmr=setTimeout(()=>{
+        apply(t.value);
+        syncRecord(n);
+        if(alsoRender) render();
+        flash();
+      },450);
+    });
+  };
+  bind("#editTitle", v=>{ n.title=v.trim()||"Untitled"; }, true);
+  bind("#editOverview", v=>{ n.desc=v.trim(); }, true);
+  bind("#editHow", v=>{ n.how=v.split(/\r?\n/).map(s=>s.trim()).filter(Boolean); });
+  bind("#editWhy", v=>{ n.why=v.trim(); });
+  bind("#editCues", v=>{ n.cues=v.split(/\r?\n/).map(s=>s.trim()).filter(Boolean); });
+
+  // remove this bubble (and any user bubbles under it)
+  const rm=detailInner.querySelector('[data-act="removeBubble"]');
+  if(rm) rm.addEventListener("click",()=>{
+    if(!confirm(`Remove “${n.title}” and any bubbles added under it?`)) return;
+    const p=NODES.get(PARENT.get(n.id));
+    removeBubble(n);
+    if(p){ ensurePath(p); select(p); } else { select(ROOT); }
+    render();
+    refreshBeltCounts();
+  });
+}
+function parentName(n){ const p=PARENT.get(n.id); return p?NODES.get(p).title:""; }
+function crumb(n){
+  const parts=[];let p=PARENT.get(n.id);
+  while(p){parts.unshift(NODES.get(p).title);p=PARENT.get(p);}
+  return parts.join("  ›  ");
+}
+function ensurePath(n){
+  let p=PARENT.get(n.id);
+  while(p){ setExpanded(NODES.get(p),true); p=PARENT.get(p); }
+}
+
+/* ---------- Belt filter ---------- */
+const BELTS=["White","Blue","Purple","Brown","Black"];
+function buildBeltChips(){
+  const box=document.getElementById("belts");
+  const hint=box.querySelector(".hint");
+  // All chip
+  const all=document.createElement("span");
+  all.className="chip all";all.dataset.belt="All";
+  all.innerHTML=`<span class="dot"></span>All belts`;
+  all.addEventListener("click",()=>{
+    BELTS.forEach(b=>state.activeBelts.add(b));
+    refreshBeltUI();render();
+  });
+  box.insertBefore(all,hint);
+  BELTS.forEach(b=>{
+    const count=countTechniques(b);
+    const c=document.createElement("span");
+    c.className="chip";c.dataset.belt=b;c.style.setProperty("--c",BELT_COLOR[b]);
+    c.innerHTML=`<span class="dot"></span>${b} belt <span class="count">${count}</span>`;
+    c.addEventListener("click",()=>{
+      if(state.activeBelts.has(b)) state.activeBelts.delete(b); else state.activeBelts.add(b);
+      if(state.activeBelts.size===0){BELTS.forEach(x=>state.activeBelts.add(x));}
+      refreshBeltUI();render();
+    });
+    box.insertBefore(c,hint);
+  });
+}
+function countTechniques(belt){
+  let c=0;
+  (function w(n){
+    if(n.children && n.children.length){ n.children.forEach(w); }
+    else { if(beltOf(n)===belt) c++; }
+  })(ROOT);
+  return c;
+}
+function refreshBeltUI(){
+  document.querySelectorAll("#belts .chip[data-belt]").forEach(c=>{
+    const b=c.dataset.belt;
+    if(b==="All") c.classList.toggle("off", false);
+    else c.classList.toggle("off", !state.activeBelts.has(b));
+  });
+}
+
+/* ---------- Toolbar ---------- */
+function expandAll(){
+  ROOTS.forEach(r=>{ (function w(n){ if(n.children && n.children.length){ state.expanded.add(n.id); n.children.forEach(w); } })(r); });
+  render();
+}
+function collapseAll(){ state.expanded.clear(); render(); }
+function exportSelfContained(){
+  // Bake the current video links + user bubbles into the SEED blocks and download the file.
+  const links = {};
+  Object.keys(videoLinks).forEach(k=>{ const v=String(videoLinks[k]||"").trim(); if(v) links[k]=v; });
+  const json = JSON.stringify(links, null, 2);
+  let html = "<!doctype html>\n" + document.documentElement.outerHTML;
+  const re = /\/\*__SEED_START__\*\/[\s\S]*?\/\*__SEED_END__\*\//;
+  if(!re.test(html)){ alert("Couldn't find the link block in this page."); return; }
+  html = html.replace(re, "/*__SEED_START__*/\n" + json + "\n/*__SEED_END__*/");
+  const nodeRe = /\/\*__SEED_NODES_START__\*\/[\s\S]*?\/\*__SEED_NODES_END__\*\//;
+  if(nodeRe.test(html)){
+    const clean = (userNodeRecords||[]).filter(r=>r&&r.uid).map(r=>({
+      uid:r.uid, parentId:r.parentId, title:r.title,
+      desc:String(r.desc||""), how:Array.isArray(r.how)?r.how:[],
+      why:String(r.why||""), cues:Array.isArray(r.cues)?r.cues:[],
+      belt:r.belt||null,
+    }));
+    html = html.replace(nodeRe, "/*__SEED_NODES_START__*/\n" + JSON.stringify(clean, null, 2) + "\n/*__SEED_NODES_END__*/");
+  }
+  const stepRe = /\/\*__SEED_STEPS_START__\*\/[\s\S]*?\/\*__SEED_STEPS_END__\*\//;
+  if(stepRe.test(html)){
+    const cleanSteps={};
+    Object.keys(extraSteps).forEach(k=>{ const a=(extraSteps[k]||[]).filter(Boolean); if(a.length) cleanSteps[k]=a; });
+    html = html.replace(stepRe, "/*__SEED_STEPS_START__*/\n" + JSON.stringify(cleanSteps, null, 2) + "\n/*__SEED_STEPS_END__*/");
+  }
+  const blob = new Blob([html], {type:"text/html;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "bjj-mindmap-self-contained.html";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+function fit(){
+  const {mapW,mapH}=computeLayout();
+  const r=svg.getBoundingClientRect();
+  if(r.height>r.width){
+    // Portrait (phone): the tree is far taller than wide — fit the full width and pin the top
+    const s=Math.min(r.width/(mapW+40),1);
+    state.view.s=s;
+    state.view.x=(r.width-(mapW+40)*s)/2;
+    state.view.y=8;
+  }else{
+    const s=Math.min(r.width/(mapW+40), r.height/(mapH+40), 1.1);
+    state.view.s=s;
+    state.view.x=(r.width-(mapW+40)*s)/2;
+    state.view.y=(r.height-(mapH+40)*s)/2;
+  }
+  render();
+}
+function zoomBy(f){
+  const r=svg.getBoundingClientRect();
+  const cx=r.width/2, cy=r.height/2;
+  const ns=Math.max(0.3,Math.min(2.5,state.view.s*f));
+  state.view.x = cx - (cx-state.view.x)*(ns/state.view.s);
+  state.view.y = cy - (cy-state.view.y)*(ns/state.view.s);
+  state.view.s=ns;
+  render();
+}
+
+/* pan & zoom on svg — one finger pans, two fingers pinch-zoom (touch) */
+let panning=null;
+const livePts=new Map();
+let pinch=null;
+function pinchState(){
+  const [a,b]=[...livePts.values()];
+  return {d:Math.hypot(b.x-a.x,b.y-a.y), mx:(a.x+b.x)/2, my:(a.y+b.y)/2};
+}
+function applyView(){
+  viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
+}
+svg.addEventListener("pointerdown",e=>{
+  if(e.target.closest(".node")) return;
+  closeMobileDetail();          // tapping empty canvas dismisses the sheet on phones
+  livePts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  try{ svg.setPointerCapture(e.pointerId); }catch(_){}
+  if(livePts.size===1){
+    panning={x:e.clientX,y:e.clientY,vx:state.view.x,vy:state.view.y};
+    svg.classList.add("panning");
+  }else if(livePts.size===2){
+    panning=null;
+    const {d,mx,my}=pinchState();
+    const r=svg.getBoundingClientRect();
+    // map-space point under the pinch midpoint — zoom stays centred on the fingers
+    const px=(mx-r.left-state.view.x)/state.view.s, py=(my-r.top-state.view.y)/state.view.s;
+    pinch={d,s:state.view.s,px,py};
+  }
+});
+svg.addEventListener("pointermove",e=>{
+  if(livePts.has(e.pointerId)) livePts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pinch && livePts.size>=2){
+    const {d,mx,my}=pinchState();
+    const r=svg.getBoundingClientRect();
+    const ns=Math.max(0.3,Math.min(2.5,pinch.s*(d/pinch.d)));
+    state.view.s=ns;
+    state.view.x=(mx-r.left)-pinch.px*ns;
+    state.view.y=(my-r.top)-pinch.py*ns;
+    applyView();
+    return;
+  }
+  if(!panning) return;
+  state.view.x=panning.vx+(e.clientX-panning.x);
+  state.view.y=panning.vy+(e.clientY-panning.y);
+  applyView();
+});
+function endPointer(e){
+  livePts.delete(e.pointerId);
+  if(livePts.size<2) pinch=null;
+  if(livePts.size===0){ panning=null; svg.classList.remove("panning"); }
+}
+svg.addEventListener("pointerup",endPointer);
+svg.addEventListener("pointercancel",endPointer);
+svg.addEventListener("wheel",e=>{
+  e.preventDefault();
+  const r=svg.getBoundingClientRect();
+  const mx=e.clientX-r.left, my=e.clientY-r.top;
+  const f=e.deltaY<0?1.12:0.89;
+  const ns=Math.max(0.3,Math.min(2.5,state.view.s*f));
+  state.view.x = mx - (mx-state.view.x)*(ns/state.view.s);
+  state.view.y = my - (my-state.view.y)*(ns/state.view.s);
+  state.view.s=ns;
+  viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
+},{passive:false});
+
+/* ---------- Wire controls ---------- */
+document.getElementById("expandAll").onclick=expandAll;
+document.getElementById("collapseAll").onclick=collapseAll;
+document.getElementById("fitBtn").onclick=fit;
+document.getElementById("exportBtn").onclick=exportSelfContained;
+document.getElementById("mbFit").onclick=fit;
+document.getElementById("zoomIn").onclick=()=>zoomBy(1.2);
+document.getElementById("mbIn").onclick=()=>zoomBy(1.2);
+document.getElementById("zoomOut").onclick=()=>zoomBy(0.8);
+document.getElementById("mbOut").onclick=()=>zoomBy(0.8);
+document.getElementById("mbExpand").onclick=expandAll;
+document.getElementById("closeDetailBtn").onclick=closeMobileDetail;
+
+const searchEl=document.getElementById("search");
+let searchTimer=null;
+searchEl.addEventListener("input",()=>{
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>{
+    state.query=searchEl.value.trim();
+    if(state.query){
+      // auto-expand so matches are visible (both trees — My Skills too)
+      ROOTS.forEach(r=>{ (function w(n){ if(n.children) { if(matches(n)) state.expanded.add(n.id); n.children.forEach(w); } })(r); });
+    }
+    render();
+  },160);
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="/" && document.activeElement!==searchEl){ e.preventDefault(); searchEl.focus(); }
+  if(e.key==="Escape"){ state.query=""; searchEl.value=""; render(); searchEl.blur(); }
+});
+
+/* ---------- Init ---------- */
+buildBeltChips();
+refreshBeltUI();
+// Start with the root, the White belt, and its first topic expanded
+state.expanded.add(ROOT.id);
+{
+  const wb=[...NODES.values()].find(n=>n.belt==="White");
+  if(wb){
+    state.expanded.add(wb.id);
+    if(wb.children && wb.children[0]) state.expanded.add(wb.children[0].id);
+  }
+}
+select(ROOT);   // populate the detail panel with the overview + the 5 belts
+render();
+closeMobileDetail();   // phones start on the map; the sheet opens when a bubble is tapped
+{
+  const r=svg.getBoundingClientRect();
+  if(r.height>r.width){
+    // Phones: the two roots sit at the top of the map — centre the viewport — so centre the viewport ON the root,
+    // between the two root bubbles, at native size. Pan / pinch / buttons to explore.
+    state.view.s=1;
+    state.view.x=Math.max(8, r.width*0.08 - ROOT.px);
+    state.view.y=r.height/2 - (ROOT.py+MY_SKILLS.py)/2;
+    render();
+  }else{
+    fit();
+  }
+}
+window.addEventListener("resize",()=>{ /* keep view; user can refit */ });
+</script>
+</body>
+</html>
