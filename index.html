@@ -22,6 +22,7 @@ header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 18px
 .search input{width:230px;padding:9px 12px 9px 34px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:13px;outline:none}
 .search input:focus{border-color:var(--accent)}
 .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.6}
+.scount{font-size:11px;font-weight:800;color:#3ecf8e;background:rgba(62,207,142,.12);border:1px solid var(--line);border-radius:999px;padding:4px 10px;white-space:nowrap;line-height:1}
 .btn{padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.15s;white-space:nowrap}
 .btn:hover{border-color:#33507e;background:#1a2740}
 .btn:active{transform:translateY(1px)}
@@ -33,6 +34,33 @@ header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 18px
 .zoomgroup button{border:none;background:var(--panel2);color:var(--ink);width:36px;height:37px;cursor:pointer;font-size:16px}
 .zoomgroup button:hover{background:#1a2740}
 .zoomgroup button+button{border-left:1px solid var(--line)}
+/* ---------- Canvas search bar (revealed by the magnifier icon in the top band) ---------- */
+.searchbar{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:8px;width:min(640px,calc(100% - 28px));padding:8px 10px 8px 13px;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 48px rgba(0,0,0,.55);z-index:40}
+.searchbar.open{display:flex}
+.searchbar>svg{flex:0 0 auto;color:var(--muted)}
+.searchbar input{flex:1;min-width:0;border:none;background:transparent;color:var(--ink);font-size:15px;outline:none;padding:6px 4px}
+.searchbar input::placeholder{color:var(--muted2)}
+.searchbar .scount{flex:0 0 auto}
+.searchbar .btn{flex:0 0 auto;padding:8px 11px}
+.sb-close{flex:0 0 auto;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-size:19px;line-height:1;cursor:pointer;transition:.15s}
+.sb-close:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+#searchToggle svg{display:block}
+#searchToggle.active{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 14%, transparent)}
+@media(max-width:720px){.searchbar{width:calc(100% - 20px);left:10px;transform:none;top:10px;gap:6px;padding:7px 8px 7px 11px}.searchbar input{font-size:16px}}
+/* ---------- Burger ("More") menu in the top banner ---------- */
+.burger{position:relative}
+.burger .ico{font-size:19px}
+.menu{position:absolute;top:calc(100% + 8px);right:0;z-index:60;min-width:244px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 48px rgba(0,0,0,.55);padding:6px;display:none;flex-direction:column;gap:2px}
+.menu.open{display:flex}
+.menu button{display:flex;align-items:center;gap:11px;width:100%;padding:9px 10px;border:none;background:transparent;color:var(--ink);font-size:13px;border-radius:8px;cursor:pointer;text-align:left;white-space:nowrap}
+.menu button:hover{background:var(--panel2)}
+.menu button .mi{width:20px;text-align:center;font-size:15px;flex:0 0 auto;opacity:.92}
+.menu hr{border:none;border-top:1px solid var(--line);margin:5px 2px}
+.menu .stat{font-size:11.5px;color:var(--muted);padding:8px 10px 7px;line-height:1.5;border-bottom:1px solid var(--line);margin-bottom:4px}
+.menu .stat b{color:var(--ink)}
+.menu .stat.warn{color:var(--gold)}
+.menu .stat.warn b{color:var(--gold)}
+@media(max-width:720px){.menu{min-width:210px;right:-6px}}
 .belts{display:none;gap:8px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--line);background:rgba(10,15,24,.4);flex-wrap:wrap}
 .belts .lbl{font-size:12px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-right:2px}
 .chip{--c:#888;display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ink);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;user-select:none}
@@ -81,6 +109,8 @@ svg.map.panning{cursor:grabbing}
 .node .card{fill:var(--card,#101a2a);stroke:#27384f;stroke-width:1.25;transition:stroke .15s,filter .15s}
 .node:hover .card{stroke:#3f5a85}
 .node.selected .card{stroke:var(--accent);stroke-width:2.2;filter:drop-shadow(0 0 10px rgba(79,140,255,.45))}
+.node.match .card{stroke:#3ecf8e;stroke-width:3;filter:drop-shadow(0 0 12px rgba(62,207,142,.7))}
+.node.matchcurrent .card{stroke:#fff;stroke-width:3.5;filter:drop-shadow(0 0 16px rgba(255,255,255,.9))}
 .node.dim{opacity:.28}
 .node .accent{stroke:var(--belt);stroke-width:4;stroke-linecap:round}
 .node .title{fill:var(--ink);font-weight:700;font-size:14px}
@@ -95,8 +125,13 @@ svg.map.panning{cursor:grabbing}
 .cardInner .pill{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--belt);background:color-mix(in srgb,var(--belt) 16%,transparent);padding:2px 8px;border-radius:999px}
 .cardInner .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--belt)}
 .cardInner .more{margin-left:8px;font-size:10px;font-weight:700;color:var(--muted2)}
-.cardInner .nav{display:inline-flex;align-items:center;gap:2px;margin-left:8px}
-.cardInner .navbtn{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted2);width:20px;height:19px;line-height:1;font-size:12px;font-weight:700;border-radius:6px;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.cardInner .cnt{display:inline-flex;align-items:center;gap:3px;margin-left:6px;font-size:10px;font-weight:700;color:var(--muted2);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:1px 7px;cursor:default;line-height:1.6;white-space:nowrap}
+.cardInner .cnt b{color:var(--ink);font-size:10.5px;font-weight:800}
+.cardInner .cnt .glyph{font-size:9px;opacity:.9}
+.cardInner .cnt.all b,.cardInner .cnt.all .glyph{color:#4bb8ff}
+.cardInner .nav{display:none;align-items:center;gap:3px;margin-left:8px}
+body.jiggle .cardInner .nav{display:inline-flex}
+.cardInner .navbtn{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted2);width:26px;height:26px;line-height:1;font-size:15px;font-weight:700;border-radius:8px;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 .cardInner .navbtn:hover{color:var(--ink);border-color:var(--belt);background:color-mix(in srgb,var(--belt) 22%, transparent)}
 .cardInner .navbtn:disabled{opacity:.32;cursor:default;pointer-events:none}
 .node .vdot{filter:drop-shadow(0 0 4px rgba(0,0,0,.5))}
@@ -107,6 +142,26 @@ svg.map.panning{cursor:grabbing}
 .node.custom .cardInner .pill .dot{background:radial-gradient(circle at 32% 30%,#fff,#e9f6ff 45%,#bfe0ff 100%);box-shadow:0 0 0 1px rgba(11,15,23,.35),0 0 6px rgba(255,255,255,.85)}
 .node.custom .accent{animation:iriHue 6s linear infinite}
 .node.custom .card{animation:iriHue 8s linear infinite}
+/* ---- Shake / jiggle delete mode (iOS style) + per-bubble expand-collapse-all ---- */
+@keyframes jgWiggle{0%,100%{transform:rotate(-1.4deg)}50%{transform:rotate(1.5deg)}}
+.node .delbadge{display:none;cursor:pointer}
+.node .delbadge .halo{fill:#ff5f57;stroke:#0b0f17;stroke-width:1.5}
+.node .delbadge .x{stroke:#10151f;stroke-width:2.6;stroke-linecap:round;fill:none}
+.node .delbadge:hover .halo{fill:#ff8a84}
+.node .xall{cursor:pointer}
+.node .xall .chip{fill:rgba(15,22,35,.92);stroke:var(--line);stroke-width:1.25}
+.node .xall:hover .chip{stroke:var(--accent);fill:#16233b}
+.node .xall .chev{stroke:var(--muted2);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.node .xall:hover .chev{stroke:var(--ink)}
+body.jiggle .node:not(.depth0){animation:jgWiggle .35s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 50%}
+body.jiggle .node .delbadge{display:inline}
+body.jiggle .node .xall .chip{stroke:var(--accent)}
+.jigglebar{position:absolute;left:14px;bottom:14px;display:none;align-items:center;gap:10px;z-index:6;background:rgba(10,15,24,.9);border:1px solid var(--line);border-radius:10px;padding:8px 12px;box-shadow:var(--shadow)}
+body.jiggle .jigglebar{display:flex}
+body.jiggle .mapstat{display:none}
+.jigglebar .msg{font-size:12px;color:#c4d1e6}
+.jigglebar .done{appearance:none;-webkit-appearance:none;border:1px solid var(--accent);background:var(--accent);color:#0b0f17;font-weight:800;font-size:12.5px;border-radius:8px;padding:6px 14px;cursor:pointer}
+.jigglebar .done:hover{filter:brightness(1.08)}
 .mapbtns{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px;z-index:3}
 .mapbtns button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
 .mapbtns button:hover{background:#1a2740;border-color:#33507e}
@@ -200,8 +255,10 @@ body.dragging .node[data-tree="skills"]{outline:2px dashed var(--ok);outline-off
 .canDrag:active{cursor:grabbing}
 .node.dragSrc .card{stroke:var(--accent);stroke-width:2;opacity:.5}
 .node.dragSrc .cardInner{opacity:.6}
-.node.reorderover .card{stroke:var(--accent);stroke-width:3}
-.reorderLine{stroke:var(--ok);stroke-width:3;stroke-linecap:round;pointer-events:none;filter:drop-shadow(0 0 6px rgba(62,207,142,.6))}
+.node.reorderover .card{stroke:var(--accent);stroke-width:3;filter:drop-shadow(0 0 10px rgba(79,140,255,.55))}
+.dropPreview{pointer-events:none}
+.dropPreview rect{fill:rgba(79,140,255,.10);stroke:var(--accent);stroke-width:2;stroke-dasharray:7 5}
+.dropPreview text{fill:var(--accent);font-size:13px;font-weight:700}
 
 /* ======================= TECHNIQUE LIBRARY (left panel) ======================= */
 .library{grid-area:lib;display:flex;flex-direction:column;border-bottom:1px solid var(--line);background:var(--panel);min-height:0}
@@ -247,11 +304,25 @@ main.libcollapsed .lib-open-tab{display:flex}
 <div class="brand"><div class="logo">BJJ</div></div>
 
 <div class="controls">
-<button class="btn" id="addRootBtn" title="Add a new root bubble"><span class="ico">⊕</span><span class="long">Add root</span></button><button class="btn" id="expandAll" title="Expand all"><span class="ico">⤢</span><span class="long">Expand all</span></button>
+<button class="btn" id="expandAll" title="Expand all"><span class="ico">⤢</span><span class="long">Expand all</span></button>
 <button class="btn" id="collapseAll" title="Collapse all"><span class="ico">⤡</span><span class="long">Collapse all</span></button>
-<div class="zoomgroup"><button id="zoomOut" title="Zoom out">-</button><button id="zoomIn" title="Zoom in">+</button></div>
 <button class="btn primary" id="fitBtn" title="Fit to view"><span class="ico">⛶</span><span class="long">Fit to view</span></button>
-<button class="btn" id="exportBtn" style="display:none" title="Download a self-contained copy"><span class="ico">↓</span><span class="long">Export self-contained</span><span class="short">Export</span></button>
+<button class="btn" id="searchToggle" type="button" title="Search the map  ( / )">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+</button>
+<div class="burger">
+  <button class="btn" id="menuBtn" title="Add root · Backup · Restore · Export" aria-haspopup="true" aria-expanded="false"><span class="ico">☰</span></button>
+  <div class="menu" id="menu" role="menu" aria-label="Map actions">
+    <div class="stat" id="menuStat"></div>
+    <button id="menuAddRoot" role="menuitem" type="button"><span class="mi">⊕</span>Add root</button>
+    <button id="menuLibrary" role="menuitem" type="button"><span class="mi">📚</span>Technique library</button>
+    <hr>
+    <button id="menuBackup" role="menuitem" type="button"><span class="mi">⤓</span>Backup map (JSON)</button>
+    <button id="menuRestore" role="menuitem" type="button"><span class="mi">⤒</span>Restore from backup</button>
+    <button id="menuExport" role="menuitem" type="button"><span class="mi">↓</span>Export self-contained HTML</button>
+    <input type="file" id="restoreFile" accept="application/json,.json" style="display:none">
+  </div>
+</div>
 </div>
 </header>
 <div class="belts" id="belts">
@@ -259,7 +330,6 @@ main.libcollapsed .lib-open-tab{display:flex}
 <span class="hint">Tip: click a bubble · drag onto <b>My Skills</b> · add child bubbles → AI drafts them · scroll to zoom</span>
 </div>
 <main class="libcollapsed">
-<button id="libOpenTab" class="lib-open-tab" type="button" title="Show library">▾ Library</button>
 <aside class="library" id="libraryPanel">
 <div class="lib-header">
 <div class="lib-title"><span class="ico">📚</span> Technique Library<button class="lib-toggle" id="libToggle" type="button" title="Hide library">⟨</button></div>
@@ -270,8 +340,16 @@ main.libcollapsed .lib-open-tab{display:flex}
 </aside>
 
 <div class="mapwrap">
+<div class="searchbar" id="searchBar" role="search" aria-label="Search the map">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+  <input id="search" type="search" placeholder="Search bubble titles & descriptions…" autocomplete="off" spellcheck="false">
+  <span class="scount" id="searchCount" hidden></span>
+  <button class="btn" id="searchNext" type="button" title="Next match (Enter)"><span class="ico">→</span><span class="long">Next</span></button>
+  <button class="sb-close" id="searchClose" type="button" title="Close search (Esc)">&#215;</button>
+</div>
 <svg class="map" id="svg"><g id="viewport"></g></svg>
 <div class="mapstat" id="stat"></div>
+<div class="jigglebar"><span class="msg">Long-press a bubble to shake · tap the <b>×</b> to delete it</span><button class="done" id="jiggleDone" type="button">Done</button></div>
 </div>
 <aside class="detail">
 <div class="sheetGrip"></div>
@@ -1631,8 +1709,12 @@ function saveExpanded(){ try{ localStorage.setItem(EXPANDED_KEY, JSON.stringify(
    by the deterministic node id (stable across loads because the seed data is fixed). */
 const NODE_EDITS_KEY="bjjNodeEdits_v1";
 const DELETED_KEY="bjjDeletedNodes_v1";
+const SEED_NODE_EDITS = /*__SEED_EDITS_START__*/{}/*__SEED_EDITS_END__*/;
 let nodeEdits={};
-(function(){ try{ nodeEdits=JSON.parse(localStorage.getItem(NODE_EDITS_KEY)||"{}")||{}; }catch(e){ nodeEdits={}; } })();
+(function(){
+  let v=null; try{ v=JSON.parse(localStorage.getItem(NODE_EDITS_KEY)||"null"); }catch(e){ v=null; }
+  nodeEdits=(v&&typeof v==="object")?v:((SEED_NODE_EDITS&&typeof SEED_NODE_EDITS==="object")?SEED_NODE_EDITS:{});
+})();
 function saveNodeEdits(){ try{ localStorage.setItem(NODE_EDITS_KEY, JSON.stringify(nodeEdits)); }catch(e){} }
 function saveNodeEdit(n){
   if(n.__user){ syncRecord(n); return; }
@@ -1647,8 +1729,12 @@ function applyNodeEdits(){
     n.desc=e.desc||""; n.how=(e.how||[]).slice(); n.why=e.why||""; n.cues=(e.cues||[]).slice();
   }
 }
+const SEED_DELETED = /*__SEED_DELETED_START__*/[]/*__SEED_DELETED_END__*/;
 let deletedNodes=[];
-(function(){ try{ deletedNodes=JSON.parse(localStorage.getItem(DELETED_KEY)||"[]")||[]; }catch(e){ deletedNodes=[]; } })();
+(function(){
+  let v=null; try{ v=JSON.parse(localStorage.getItem(DELETED_KEY)||"null"); }catch(e){ v=null; }
+  deletedNodes=Array.isArray(v)?v:(Array.isArray(SEED_DELETED)?SEED_DELETED:[]);
+})();
 function saveDeletedNodes(){ try{ localStorage.setItem(DELETED_KEY, JSON.stringify(deletedNodes)); }catch(e){} }
 function applyDeletions(){
   const order=deletedNodes.slice().sort((a,b)=>{ const A=NODES.get(a),B=NODES.get(b); return (A?A.depth:0)-(B?B.depth:0); });
@@ -1660,8 +1746,12 @@ function applyDeletions(){
    drag-reorder survives reloads. Coexists with the user-bubble / edit / delete
    stores; nodes not in the saved list (e.g. added later) simply land at the end. */
 const ORDER_KEY="bjjNodeOrder_v1";
+const SEED_NODE_ORDER = /*__SEED_ORDER_START__*/{}/*__SEED_ORDER_END__*/;
 let nodeOrder={};
-(function(){ try{ nodeOrder=JSON.parse(localStorage.getItem(ORDER_KEY)||"{}")||{}; }catch(e){ nodeOrder={}; } })();
+(function(){
+  let v=null; try{ v=JSON.parse(localStorage.getItem(ORDER_KEY)||"null"); }catch(e){ v=null; }
+  nodeOrder=(v&&typeof v==="object")?v:((SEED_NODE_ORDER&&typeof SEED_NODE_ORDER==="object")?SEED_NODE_ORDER:{});
+})();
 function saveNodeOrder(){ try{ localStorage.setItem(ORDER_KEY, JSON.stringify(nodeOrder)); }catch(e){} }
 function applyNodeOrder(){
   // restore root order (persisted under the "__ROOTS__" sentinel by nudge())
@@ -1784,6 +1874,7 @@ function moveBubble(dragged,target,above){
   if(dragged.depth===0) return false;                       // ROOT can't be moved
   const oldParent=NODES.get(PARENT.get(dragged.id)); if(!oldParent) return false;
   const keepBelt=beltOf(dragged);   // remember the card's current belt so it keeps its colour after moving
+  const stayCustom=!!(dragged.__user && !dragged.belt);   // a user "Custom" bubble (no belt of its own) keeps its own formatting
   // Decide the destination parent (block moves that would create a cycle)
   let newParent;
   if(target===oldParent) return false;                // own parent -> no-op (reorder with the up/down arrows)               // dropped on the parent card → top/bottom of its list
@@ -1800,13 +1891,38 @@ function moveBubble(dragged,target,above){
   newParent.children.splice(insertAt,0,dragged);
   PARENT.set(dragged.id,newParent.id);                       // keep the data model consistent
   redepth(dragged,newParent.depth+1);
-  if(keepBelt) dragged.belt=keepBelt;   // lock colour: a White card stays White even after being moved elsewhere
+  if(stayCustom){ dragged.belt=null; }              // user "Custom" bubble keeps its own (pink) formatting, even under a White/Blue/etc. parent
+  else if(keepBelt){ dragged.belt=keepBelt; }        // lock colour: a White card stays White even after being moved elsewhere
   state.expanded.add(newParent.id); saveExpanded();
   if(dragged.__user){ const r=recordOf(dragged); if(r){ r.parentId=newParent.id; r.belt=(dragged.belt||null); } saveUserNodes(); }
   nodeOrder[oldParent.id]=(oldParent.children||[]).map(c=>c.id);
   if(newParent!==oldParent) nodeOrder[newParent.id]=(newParent.children||[]).map(c=>c.id);
   saveNodeOrder();
   return true;
+}
+/* Top-level root a node lives under (walk up PARENT until depth 0). */
+function rootOf(n){ let cur=n; while(cur && PARENT.has(cur.id)) cur=NODES.get(PARENT.get(cur.id)); return cur; }
+/* Cross-root drag = COPY the whole subtree (the original stays). Same-root drag = move (moveBubble).
+   Reuses addChildBubble() so each copy gets a fresh uid + userNodeRecords entry + a stable id,
+   exactly like a user-added bubble — so it persists to localStorage and is included in Export. */
+function copyBubble(dragged, target, above){
+  if(!dragged || !target || dragged.id===target.id) return null;
+  if(dragged.depth===0) return null;              // roots can't be copied
+  if(isAncestorOf(dragged, target)) return null;  // don't copy into its own subtree
+  target.children = target.children || [];
+  function clone(src, parent){
+    const copyBelt = (src.__user && !src.belt) ? null : beltOf(src);   // a user "Custom" bubble stays Custom; otherwise carry its (derived) belt
+    const n = addChildBubble(parent, { title:src.title, desc:(src.desc!=null?src.desc:""), how:(src.how||[]).slice(), why:(src.why!=null?src.why:""), cues:(src.cues||[]).slice(), belt:copyBelt });
+    (src.children||[]).forEach(function(ch){ clone(ch, n); });
+    return n;
+  }
+  const copied = clone(dragged, target);
+  if(above){ const c=target.children.indexOf(copied); if(c!==-1) target.children.splice(c,1); target.children.unshift(copied); }
+  if(videoLinks[dragged.id]) videoLinks[copied.id]=videoLinks[dragged.id];
+  state.expanded.add(target.id);
+  nodeOrder[target.id]=(target.children||[]).map(c=>c.id);
+  saveExpanded(); saveNodeOrder(); saveVideoLinks();
+  return copied;
 }
 
 function nudge(n, dir){
@@ -1860,7 +1976,7 @@ function visibleChildren(n){
 function hasVisibleChildren(n){ return visibleChildren(n).length>0; }
 
 /* ======================= LAYOUT ======================= */
-const M = { cardH:86, vGap:26, hGap:96, nodeW:272, padTop:40, padLeft:40 };
+const M = { cardH:129, vGap:26, hGap:96, nodeW:218, padTop:40, padLeft:40 };
 
 function computeLayout(){
   // Build the visible tree (respecting expansion + belt filter)
@@ -2133,12 +2249,7 @@ async function runAutoFill(n){
   refreshUserLib();
 }
 
-function matches(n){
-  if(!state.query) return true;
-  const q=state.query.toLowerCase();
-  if(n.title.toLowerCase().includes(q)||(n.desc||"").toLowerCase().includes(q)) return true;
-  return (n.children||[]).some(matches);
-}
+/* (recursive matches() removed — dimming now uses the precomputed __matchKeep set, built once by collectMatches) */
 
 let __lastTouchDragAt=0;   // Date.now() right after a touch-drag; a node click within ~350ms is the trailing synthetic tap → swallowed (timestamp, not a stuck boolean)
 function render(){
@@ -2146,6 +2257,7 @@ function render(){
   viewport.innerHTML="";
   viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
   const q=state.query;
+  const searching=!!(q && q.trim());
   // Edges first
   ROOTS.forEach(function(r){
     (function walk(n){
@@ -2160,8 +2272,11 @@ function render(){
   // Nodes
   ROOTS.forEach(function(r){
   (function walk(n){
-    const isCustom = !!(n.__user && n.depth>0);   // user *bubbles* only — top-level roots keep "Root" styling
-    const g=el("g",{class:"node depth"+n.depth+(isCustom?" custom":"")+(state.selectedId===n.id?" selected":"")+(q&&!matches(n)?" dim":"")});
+    // A user bubble gets the pink "Custom" styling ONLY when it has no belt of its own.
+    // A copy (or a moved node) that carries a real belt keeps that belt's colour — White stays White, Blue stays Blue —
+    // while still remaining a user node (editable, persistent, exported).
+    const isCustom = !!(n.__user && n.depth>0 && !n.belt);
+    const g=el("g",{class:"node depth"+n.depth+(isCustom?" custom":"")+(state.selectedId===n.id?" selected":"")+(searching&&!__matchKeep.has(n.id)?" dim":"")+(__matchSelf.has(n.id)?" match":"")+((__currentMatchId&&n.id===__currentMatchId)?" matchcurrent":"")});
     g.setAttribute("data-id", n.id);
     const belt = isCustom ? "Custom" : (n.belt || (n.depth===0?"Root":beltOf(n)));
     const color = BELT_COLOR[belt]||"#888";
@@ -2182,19 +2297,24 @@ function render(){
     const div=document.createElementNS("http://www.w3.org/1999/xhtml","div");
     div.setAttribute("class","cardInner");
     div.style.cssText="width:100%;height:100%;padding:11px 13px;overflow:hidden";
-    let more="";
+    let counts="";
     if(n.children && n.children.length){
-      more = isExpanded(n) ? "⤡ "+n.children.length : "⤢ "+n.children.length;
+      const kids=n.children.length;
+      const desc=countDescendants(n);
+      counts =
+        `<span class="cnt" title="${kids} child${kids>1?"ren":""}"><b>${kids}</b><span class="glyph">▸</span></span>`+
+        `<span class="cnt all" title="${desc} descendant${desc>1?"s":""} total"><b>${desc}</b><span class="glyph">▾</span></span>`;
     }
     div.innerHTML =
       `<div class="row">`+
         (belt?`<span class="pill"><span class="dot"></span>${belt.toUpperCase()}</span>`:"")+
-        `<span class="more">${esc(more)}</span>`+
+        `${counts}`+
         ((function(){ const pid=PARENT.get(n.id); const c=pid?NODES.get(pid).children:ROOTS; const i=c.indexOf(n); return (c&&c.length>1)?`<span class="nav"><button type="button" class="navbtn up" data-nav="up" title="Move above the previous bubble"${i>0?"":" disabled"}>↑</button><button type="button" class="navbtn down" data-nav="down" title="Move below the next bubble"${(i>=0&&i<c.length-1)?"":" disabled"}>↓</button></span>`:""; })())+
       `</div>`+
       `<p class="t">${esc(n.title)}</p>`+
       `<p class="d">${esc(n.desc)}</p>`;
     div.querySelectorAll(".navbtn").forEach(function(b){ b.addEventListener("click",function(ev){ ev.stopPropagation(); ev.preventDefault(); nudge(n, b.dataset.nav==="up"?-1:1); }); b.addEventListener("dblclick",function(ev){ ev.stopPropagation(); ev.preventDefault(); }); });
+    div.querySelectorAll(".cnt").forEach(function(b){ b.addEventListener("click",function(ev){ ev.stopPropagation(); ev.preventDefault(); }); b.addEventListener("dblclick",function(ev){ ev.stopPropagation(); ev.preventDefault(); }); });
     fo.appendChild(div);
     g.appendChild(fo);
     // Non-root bubbles are draggable so the user can reorder / re-parent them
@@ -2205,10 +2325,26 @@ function render(){
       div.addEventListener("dragstart",(ev)=>{
         reorderDrag=n.id;
         g.classList.add("dragSrc");
+        window.__bjjDragStart={x:ev.clientX,y:ev.clientY};
         if(ev.dataTransfer){ ev.dataTransfer.effectAllowed="move"; try{ ev.dataTransfer.setData("text/x-bjj-move", n.id); }catch(_){} }
       });
-      div.addEventListener("dragend",()=>{ reorderDrag=null; g.classList.remove("dragSrc"); clearReorderHl(); hideDropLine(); });
+      div.addEventListener("dragend",()=>{ reorderDrag=null; g.classList.remove("dragSrc"); clearReorderHl(); hideDropLine(); hideDropPreview(); });
     }
+
+    /* ---- Per-bubble edge/corner controls (SVG so they overlay the card & aren't clipped) ---- */
+    // (a) Delete × at the top-right corner — hidden until shake mode; tap to delete this bubble.
+    if(n.depth>0){
+      const bx=x+M.nodeW, by=y;
+      const del=el("g",{class:"delbadge"});
+      const dtt=el("title",{}); dtt.textContent="Delete this bubble"; del.appendChild(dtt);
+      del.appendChild(el("circle",{class:"halo",cx:bx,cy:by,r:13}));
+      del.appendChild(el("path",{class:"x",d:`M ${bx-5} ${by-5} L ${bx+5} ${by+5} M ${bx+5} ${by-5} L ${bx-5} ${by+5}`}));
+      del.style.cursor="pointer";
+      del.addEventListener("click",function(ev){ ev.stopPropagation(); ev.preventDefault(); deleteNode(n); });
+      del.addEventListener("dblclick",function(ev){ ev.stopPropagation(); ev.preventDefault(); });
+      g.appendChild(del);
+    }
+
     g.addEventListener("click",(ev)=>{ev.stopPropagation();if(Date.now()-__lastTouchDragAt<350){return;}onNodeClick(n);});
     viewport.appendChild(g);
     n.visChildren.forEach(c=>walk(c));
@@ -2235,14 +2371,130 @@ let __singleClickTimer=null;
 let __lastClick={t:0,id:null};
 function doToggleExpand(n){
   if(!(n.children && n.children.length)) return;          // leaf: nothing to expand
-  setExpanded(n, !isExpanded(n));
+  const willExpand=!isExpanded(n);
+  // A single click always means "one level": clear any deeper expansion under n so that
+  // re-opening shows ONLY the immediate children (not the whole previously-expanded subtree).
+  (function w(x){ (x.children||[]).forEach(function(c){ if(state.expanded.has(c.id)) state.expanded.delete(c.id); w(c); }); })(n);
+  setExpanded(n, willExpand);
   // also expand ancestors so the path stays visible
   let p=PARENT.get(n.id);
   while(p){ setExpanded(NODES.get(p),true); p=PARENT.get(p); }
   render();
-  revealNode(n.id);   // re-center on the tapped node at a readable zoom
+  if(willExpand && n.visChildren && n.visChildren.length){
+    focusNodeAndChildren(n);   // centre the bubble + its just-revealed children (2 columns)
+  } else {
+    revealNode(n.id);          // collapsed / no visible children → centre on the bubble alone
+  }
+}
+/* ---------- Shake (jiggle) delete mode — iOS style ----------
+   Long-press any bubble → it (and its siblings) wiggle and a red × appears at the
+   top-right corner. Tap the × to delete. Tap empty space / Done / Esc to exit. */
+let shakeMode=false;
+function enterJiggle(){
+  if(shakeMode) return;
+  shakeMode=true;
+  if(document.body) document.body.classList.add("jiggle");
+  if(navigator && navigator.vibrate){ try{ navigator.vibrate(60); }catch(e){} }
+}
+function exitJiggle(){
+  if(!shakeMode) return;
+  shakeMode=false;
+  if(document.body) document.body.classList.remove("jiggle");
+}
+function deleteNode(n){
+  if(!n || n.depth===0) return;                     // roots can't be deleted
+  if(!confirm(`Delete "${n.title}" and any bubbles under it?`)) return;
+  removeBubble(n);
+  if(!deletedNodes.includes(n.id)) deletedNodes.push(n.id);
+  saveDeletedNodes();
+  if(state.selectedId===n.id){ state.selectedId=null; closeDetailSheet(); }
+  render();
+  refreshBeltCountsInline();
+}
+/* ---------- Expand-all / collapse-all for a bubble's whole subtree ---------- */
+function subtreeFullyExpanded(n){
+  let ok=true;
+  (function w(x){
+    if(x.children && x.children.length){
+      if(!state.expanded.has(x.id)) ok=false;
+      x.children.forEach(w);
+    }
+  })(n);
+  return ok;
+}
+function toggleSubtree(n){
+  if(!n || !n.children || !n.children.length) return;
+  const expand = !subtreeFullyExpanded(n);
+  (function w(x){
+    if(x.children && x.children.length){
+      if(expand) state.expanded.add(x.id); else state.expanded.delete(x.id);
+      x.children.forEach(w);
+    }
+  })(n);
+  let p=PARENT.get(n.id); while(p){ state.expanded.add(NODES.get(p).id); p=PARENT.get(p); }  // keep the path visible
+  saveExpanded();
+  render();
+}
+/* ---- Two-number expansion controls on each bubble: ▸ children (one level) · ▾ all descendants (whole straight line) ---- */
+function countDescendants(n){
+  let c=0;
+  (n.children||[]).forEach(function(ch){ c += 1 + countDescendants(ch); });
+  return c;
+}
+function _ensureAncestorsVisible(n){ let p=PARENT.get(n.id); while(p){ state.expanded.add(NODES.get(p).id); p=PARENT.get(p); } }
+function expandOneLevel(n){
+  if(!n||!n.children||!n.children.length) return;
+  state.expanded.add(n.id);
+  _ensureAncestorsVisible(n);
+  saveExpanded();
+  render();
+  focusNodeAndChildren(n);   // centre node + its children (2-column view)
+}
+function expandSubtree(n){
+  if(!n||!n.children||!n.children.length) return;
+  (function w(x){ if(x.children&&x.children.length){ state.expanded.add(x.id); x.children.forEach(w); } })(n);
+  _ensureAncestorsVisible(n);
+  saveExpanded();
+  render();
+  focusSubtree(n);           // centre the whole revealed straight-line subtree
+}
+function focusSubtree(n){
+  if(!n) return;
+  computeLayout();
+  const r=svg.getBoundingClientRect(); if(!r.width||!r.height) return;
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  (function w(x){ if(x.px!=null){ if(x.px<x0)x0=x.px; if(x.px+M.nodeW>x1)x1=x.px+M.nodeW; if(x.py<y0)y0=x.py; if(x.py+M.cardH>y1)y1=x.py+M.cardH; } (x.visChildren||[]).forEach(w); })(n);
+  if(x0===Infinity) return;
+  const P=48; const bw=(x1-x0)+2*P, bh=(y1-y0)+2*P;
+  let s=Math.min(r.width/bw, r.height/bh); s=Math.max(0.3, Math.min(1.0, s));
+  const cx=(x0+x1)/2, cy=(y0+y1)/2;
+  state.view.s=s; state.view.x=(r.width/2)-cx*s; state.view.y=(r.height/2)-cy*s;
+  viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
+  render();
+  saveView();
+}
+/* Centre the current set of search matches in the middle of the screen and zoom to fit them all. */
+function fitToMatches(){
+  const ms=__searchMatches;
+  if(!ms||!ms.length) return false;
+  ms.forEach(function(m){ let p=PARENT.get(m.id); while(p){ state.expanded.add(NODES.get(p).id); p=PARENT.get(p); } }); // reveal each match's path
+  saveExpanded();
+  render();
+  computeLayout();
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  ms.forEach(function(n){ if(n.px==null) return; if(n.px<x0)x0=n.px; if(n.px+M.nodeW>x1)x1=n.px+M.nodeW; if(n.py<y0)y0=n.py; if(n.py+M.cardH>y1)y1=n.py+M.cardH; });
+  if(x0===Infinity) return false;
+  const r=svg.getBoundingClientRect(); if(!r.width||!r.height) return false;
+  const P=64; const bw=(x1-x0)+2*P, bh=(y1-y0)+2*P;
+  let s=Math.min(r.width/bw, r.height/bh); s=Math.max(0.2, Math.min(1.1, s));
+  state.view.s=s; state.view.x=(r.width/2)-((x0+x1)/2)*s; state.view.y=(r.height/2)-((y0+y1)/2)*s;
+  viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
+  saveView();
+  return true;
 }
 function onNodeClick(n){
+  if(shakeMode){ return; }              // in shake mode, plain node clicks are inert (use the ×, or Done/Esc/background)
+  exitSearchIfActive();                 // clicking a bubble exits the search (if active)
   const now=Date.now();
   if(__lastClick.id===n.id && (now-__lastClick.t)<300){  // ---- double click / double tap ----
     __lastClick={t:0,id:null};
@@ -2582,6 +2834,17 @@ function exportSelfContained(){
     }));
     html = html.replace(nodeRe, "/*__SEED_NODES_START__*/\n" + JSON.stringify(clean, null, 2) + "\n/*__SEED_NODES_END__*/");
   }
+  // Bake the editable state (built-in edits / deletions / order) so the copy is faithful.
+  const bake=function(mark, val){
+    const src="/\\*__SEED_"+mark+"_START__\\*/[\\s\\S]*?/\\*__SEED_"+mark+"_END__\\*/";
+    const re=new RegExp(src);
+    if(!re.test(html)) return;
+    const replacement="/*__SEED_"+mark+"_START__*/\n" + JSON.stringify(val==null?{}:val, null, 2) + "\n/*__SEED_"+mark+"_END__*/";
+    html=html.replace(re, function(){ return replacement; });
+  };
+  bake("EDITS", nodeEdits||{});
+  bake("DELETED", deletedNodes||[]);
+  bake("ORDER", nodeOrder||{});
   const blob = new Blob([html], {type:"text/html;charset=utf-8"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -2589,6 +2852,88 @@ function exportSelfContained(){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 2000);
 }
+/* ======================= BACKUP / RESTORE (reliability) =======================
+   Everything the app stores lives in localStorage under these 8 keys. A backup
+   grabs ALL of them into one JSON file; a restore writes them all back. */
+const LAST_BACKUP_KEY="bjjLastBackupAt_v1";
+const BACKUP_KEYS=[VIEW_KEY,USER_NODES_KEY,EXPANDED_KEY,NODE_EDITS_KEY,DELETED_KEY,ORDER_KEY,VIDEO_KEY,AI_KEY];
+function relTime(ts){
+  const diff=Math.max(0,Date.now()-ts), m=Math.round(diff/60000);
+  if(m<1) return "just now";
+  if(m<60) return m+" min ago";
+  const h=Math.round(m/60); if(h<24) return h+" hr ago";
+  const d=Math.round(h/24); return d+" day"+(d>1?"s":"")+" ago";
+}
+function refreshMenuStat(){
+  const el=document.getElementById("menuStat"); if(!el) return;
+  let raw=null; try{ raw=localStorage.getItem(LAST_BACKUP_KEY); }catch(e){}
+  const ts=raw?parseInt(raw,10):null;
+  if(!ts||isNaN(ts)){ el.innerHTML="Auto-saved to this browser · <b>not backed up yet</b>"; el.classList.add("warn"); }
+  else{ el.innerHTML="Auto-saved to this browser · Last backup: "+relTime(ts); el.classList.toggle("warn",(Date.now()-ts) > 24*3600*1000); }
+}
+function downloadText(name, text, type){
+  const blob=new Blob([text],{type:type||"application/json;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+function backupJSON(){
+  const data={};
+  BACKUP_KEYS.forEach(function(k){
+    const raw=localStorage.getItem(k); if(raw==null) return;
+    try{ data[k]=JSON.parse(raw); }catch(e){ data[k]=raw; }
+  });
+  const payload={app:"bjj-mindmap", version:1, savedAt:new Date().toISOString(), data:data};
+  const d=new Date();
+  const name="bjj-backup-"+d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+".json";
+  downloadText(name, JSON.stringify(payload,null,2));
+  try{ localStorage.setItem(LAST_BACKUP_KEY, String(Date.now())); }catch(e){}
+  refreshMenuStat();
+}
+function restoreFromJSON(file){
+  const reader=new FileReader();
+  reader.onload=function(){
+    let payload=null; try{ payload=JSON.parse(reader.result); }catch(e){ alert("That file isn't valid JSON."); return; }
+    const data=(payload && payload.data) || (payload && typeof payload==="object" && payload[VIEW_KEY]!=null ? payload : null);
+    if(!data || typeof data!=="object" || !Object.keys(data).length){ alert("Not a BJJ mind-map backup (missing data)."); return; }
+    const keys=Object.keys(data).filter(function(k){ return BACKUP_KEYS.indexOf(k)!==-1; });
+    if(!keys.length){ alert("No recognisable map data in that backup."); return; }
+    if(!confirm("Restore this backup?\nIt will REPLACE your current map data (all "+keys.length+" item(s) found).\n\nThis cannot be undone.")) return;
+    keys.forEach(function(k){ try{ localStorage.setItem(k, JSON.stringify(data[k])); }catch(e){} });
+    try{ localStorage.removeItem(LAST_BACKUP_KEY); }catch(e){}
+    location.reload();
+  };
+  reader.onerror=function(){ alert("Couldn't read that file."); };
+  reader.readAsText(file);
+}
+/* Wire the burger ("More") menu: open/close + its actions. */
+(function(){
+  const btn=document.getElementById("menuBtn"), menu=document.getElementById("menu");
+  if(!btn||!menu) return;
+  const open=function(){ menu.classList.add("open"); btn.setAttribute("aria-expanded","true"); refreshMenuStat(); };
+  const close=function(){ menu.classList.remove("open"); btn.setAttribute("aria-expanded","false"); };
+  const toggle=function(){ if(menu.classList.contains("open")) close(); else open(); };
+  btn.addEventListener("click",function(e){ e.stopPropagation(); toggle(); });
+  menu.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(e.target && e.target.closest && e.target.closest("button")) close();
+  });
+  document.addEventListener("click",function(e){ if(!menu.contains(e.target)) close(); });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") close(); });
+  const g=function(id){ return document.getElementById(id); };
+  g("menuAddRoot").addEventListener("click",function(){ addRoot(); });
+  g("menuLibrary").addEventListener("click",function(){
+    const m=document.querySelector("main");
+    if(m){ m.classList.remove("libcollapsed"); const tg2=document.getElementById("libToggle"); if(tg2){ tg2.textContent="▾"; tg2.title="Hide library"; } }
+  });
+  g("menuBackup").addEventListener("click",function(){ backupJSON(); });
+  g("menuExport").addEventListener("click",function(){ exportSelfContained(); });
+  const file=g("restoreFile");
+  g("menuRestore").addEventListener("click",function(){ file.value=""; file.click(); });
+  file.addEventListener("change",function(){ if(file.files && file.files[0]) restoreFromJSON(file.files[0]); });
+  refreshMenuStat();
+})();
 function revealNode(id){
   const n=NODES.get(id); if(!n) return;
   const r=svg.getBoundingClientRect();
@@ -2599,6 +2944,112 @@ function revealNode(id){
   state.view.y=(r.height/2)-cy*s;
   viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
   saveView();
+}
+/* Centre the map on a node AND its first-level (visible) children → the "two
+   columns" you see after a single-click expand. Kept at a readable scale. */
+function focusNodeAndChildren(n){
+  if(!n) return;
+  computeLayout();                          // ensure px/py/visChildren are current
+  const r=svg.getBoundingClientRect(); if(!r.width||!r.height) return;
+  let x0=n.px, x1=n.px+M.nodeW, y0=n.py, y1=n.py+M.cardH;
+  const kids=(n.visChildren||[]).filter(function(c){ return c && c.px!=null; });
+  kids.forEach(function(c){
+    if(c.px<x0) x0=c.px;
+    if(c.px+M.nodeW>x1) x1=c.px+M.nodeW;
+    if(c.py<y0) y0=c.py;
+    if(c.py+M.cardH>y1) y1=c.py+M.cardH;
+  });
+  const P=48;                               // breathing room around the two columns
+  const bw=(x1-x0)+2*P, bh=(y1-y0)+2*P;
+  let s=Math.min(r.width/bw, r.height/bh);
+  s=Math.max(0.4, Math.min(1.0, s));        // keep it readable
+  const cx=(x0+x1)/2, cy=(y0+y1)/2;
+  state.view.s=s;
+  state.view.x=(r.width/2)-cx*s;
+  state.view.y=(r.height/2)-cy*s;
+  viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
+  render();
+  saveView();
+}
+/* ---- Canvas text search: find matching text across the whole tree (even collapsed), highlight + dim, jump through matches ---- */
+let __searchMatches=[];
+let __searchIdx=-1;
+let __currentMatchId=null;
+let __matchSelf=new Set();   // ids whose own title/desc matches (green highlight)
+let __matchKeep=new Set();   // ids to keep bright (self-match OR has a matching descendant); everything else dims
+function selfMatch(n,q){
+  const qq=String(q||"").toLowerCase();
+  return !!(qq && n && (String(n.title).toLowerCase().indexOf(qq)>=0 || String(n.desc||"").toLowerCase().indexOf(qq)>=0));
+}
+function collectMatches(){
+  const q=(state.query||"").toLowerCase().trim();
+  __searchMatches=[]; __searchIdx=-1; __matchSelf=new Set(); __matchKeep=new Set();
+  if(!q) return __searchMatches;
+  function walk(n){
+    let keep = selfMatch(n,q);
+    if(keep){ __searchMatches.push(n); __matchSelf.add(n.id); }
+    const kids=n.children||[];
+    for(let i=0;i<kids.length;i++){ if(walk(kids[i])) keep=true; }
+    if(keep) __matchKeep.add(n.id);
+    return keep;
+  }
+  for(let i=0;i<ROOTS.length;i++){ walk(ROOTS[i]); }
+  return __searchMatches;
+}
+function updateSearchBadge(){
+  const elc=document.getElementById("searchCount");
+  if(!elc) return;
+  const N=__searchMatches.length;
+  if(!N){ elc.hidden=true; elc.textContent=""; return; }
+  elc.hidden=false;
+  elc.textContent = (__searchIdx>=0) ? ((__searchIdx+1)+" / "+N) : (N+" found");
+}
+function focusOnNode(n){
+  if(!n) return false;
+  computeLayout();
+  if(n.px==null) return false;
+  const r=svg.getBoundingClientRect(); if(!r.width||!r.height) return false;
+  const s=Math.max(0.6,Math.min(1.0,0.85));
+  const cx=n.px+M.nodeW/2, cy=n.py+M.cardH/2;
+  state.view.s=s; state.view.x=(r.width/2)-cx*s; state.view.y=(r.height/2)-cy*s;
+  return true;
+}
+function gotoMatch(k){
+  if(!__searchMatches.length) collectMatches();
+  if(!__searchMatches.length) return;
+  __searchIdx=((k%__searchMatches.length)+__searchMatches.length)%__searchMatches.length;
+  const target=__searchMatches[__searchIdx];
+  __currentMatchId=target.id;
+  let p=PARENT.get(target.id); while(p){ state.expanded.add(NODES.get(p).id); p=PARENT.get(p); }  // reveal the path so it's visible
+  saveExpanded();
+  focusSubtree(target);   // centre the match + its revealed children in the middle of the screen, zoomed to fit
+  updateSearchBadge();
+}
+function nextMatch(){ gotoMatch(__searchIdx+1); }
+function prevMatch(){ gotoMatch(__searchIdx-1); }
+function openSearchBar(){
+  const bar=document.getElementById("searchBar"); if(bar) bar.classList.add("open");
+  const inp=document.getElementById("search"); if(inp){ inp.focus(); inp.select(); }
+}
+function closeSearchBar(){
+  const bar=document.getElementById("searchBar"); if(bar) bar.classList.remove("open");
+}
+function syncSearchActive(){
+  const t=document.getElementById("searchToggle");
+  if(t) t.classList.toggle("active", !!(state.query && state.query.trim()));
+}
+function clearSearch(){
+  state.query="";
+  const inp=document.getElementById("search"); if(inp) inp.value="";
+  __searchMatches=[]; __searchIdx=-1; __currentMatchId=null;
+  updateSearchBadge();
+  closeSearchBar();
+  syncSearchActive();
+  render();
+}
+function exitSearchIfActive(){
+  const bar=document.getElementById("searchBar");
+  if((state.query && state.query.trim()) || (bar && bar.classList.contains("open"))){ clearSearch(); }
 }
 function fit(){
   const {mapW,mapH}=computeLayout();
@@ -2640,6 +3091,7 @@ function zoomBy(f){
    pinch-zoom about their midpoint. Tapping a bubble is untouched — we bail out
    of panning whenever a pointer lands on a .node. */
 let panning=null;
+let __lastPanAt=0;                    // last real pan (so a click right after a pan isn't treated as an "empty canvas click")
 let pinch=null;                  // {d0, s0, x0, y0, mx, my}
 const svgPointers=new Map();     // pointerId -> {x,y}
 svg.addEventListener("pointerdown",e=>{
@@ -2678,7 +3130,7 @@ svg.addEventListener("pointermove",e=>{
 function endPointer(e){
   svgPointers.delete(e.pointerId);
   if(svgPointers.size<2) pinch=null;
-  if(svgPointers.size===0){ panning=null; svg.classList.remove("panning"); saveView(); }
+  if(svgPointers.size===0){ if(panning){ panning=null; __lastPanAt=Date.now(); } svg.classList.remove("panning"); saveView(); }
 }
 svg.addEventListener("pointerup",endPointer);
 svg.addEventListener("pointercancel",endPointer);
@@ -2696,13 +3148,57 @@ svg.addEventListener("wheel",e=>{
 },{passive:false});
 
 /* ---------- Wire controls ---------- */
-document.getElementById("addRootBtn").onclick=addRoot;
 document.getElementById("expandAll").onclick=expandAll;
 document.getElementById("collapseAll").onclick=collapseAll;
 document.getElementById("fitBtn").onclick=fit;
-document.getElementById("exportBtn").onclick=exportSelfContained;
-document.getElementById("zoomIn").onclick=()=>zoomBy(1.2);
-document.getElementById("zoomOut").onclick=()=>zoomBy(0.8);
+(function(){
+  const inp=document.getElementById("search");
+  const toggle=document.getElementById("searchToggle");
+  const closeBtn=document.getElementById("searchClose");
+  if(toggle) toggle.addEventListener("click", function(){
+    const bar=document.getElementById("searchBar");
+    if(bar && bar.classList.contains("open")){ closeSearchBar(); }
+    else { openSearchBar(); }
+  });
+  if(closeBtn) closeBtn.addEventListener("click", function(){ clearSearch(); });
+  if(inp){
+    let __searchTimer=null;
+    inp.addEventListener("input", function(){
+      state.query=inp.value.trim();
+      __currentMatchId=null;
+      collectMatches();
+      updateSearchBadge();
+      syncSearchActive();
+      if(__searchTimer) clearTimeout(__searchTimer);
+      __searchTimer=setTimeout(function(){
+        if(state.query && __searchMatches.length){ fitToMatches(); }   // reveal + centre + zoom-to-fit all the results
+        else { render(); }
+      }, 180);
+    });
+    inp.addEventListener("keydown", function(e){
+      if(e.key==="Enter"){ e.preventDefault(); if(e.shiftKey) prevMatch(); else nextMatch(); }
+      else if(e.key==="Escape"){ e.preventDefault(); clearSearch(); }
+    });
+  }
+  const nx=document.getElementById("searchNext"); if(nx) nx.addEventListener("click", function(){ nextMatch(); });
+  document.addEventListener("keydown", function(e){
+    if(e.key==="/"){
+      const a=document.activeElement;
+      if(a && (a.tagName==="INPUT"||a.tagName==="TEXTAREA"||a.isContentEditable)) return;
+      e.preventDefault();
+      openSearchBar();
+    }
+  });
+  // Clicking empty canvas space (not a bubble, and not right after a pan/drag) exits the search
+  const cv=document.getElementById("svg");
+  if(cv) cv.addEventListener("click", function(e){
+    if(Date.now()-__lastTouchDragAt<350) return;      // it was a touch drag/swipe, not a click
+    if(Date.now()-__lastPanAt<350) return;            // it was a pan, not a click
+    const t=e.target;
+    if(t && t.closest && t.closest("g.node")) return; // a bubble click is handled by onNodeClick
+    exitSearchIfActive();
+  });
+})();
 
 /* ======================= TECHNIQUE LIBRARY (left panel) ======================= */
 const LIB = { collapsed:new Set() };
@@ -2956,6 +3452,37 @@ function showDropLine(x,y){
   reorderLine.setAttribute("y1",y); reorderLine.setAttribute("y2",y);
 }
 function hideDropLine(){ if(reorderLine && reorderLine.parentNode) reorderLine.parentNode.removeChild(reorderLine); reorderLine=null; }
+/* ---- New re-parent UX: blue border on the prospective parent + a dashed "new child" preview (replaces the green insert bars) ---- */
+function isReParentTarget(dragged,target){
+  if(!dragged||!target||dragged.id===target.id) return false;
+  const oldParent=NODES.get(PARENT.get(dragged.id));
+  if(!oldParent) return false;
+  if(target===oldParent) return false;                       // own parent → use the ↑/↓ buttons
+  if(PARENT.get(target.id)===oldParent.id) return false;     // sibling → use the ↑/↓ buttons
+  if(isAncestorOf(dragged,target)) return false;             // would create a cycle
+  return true;
+}
+let dropPreview=null;
+function showDropPreview(target){
+  hideDropPreview();
+  if(!target || target.px==null) return;
+  let px, py;
+  const kids=(target.visChildren||[]);
+  if(kids.length){ const last=kids[kids.length-1]; px=last.px; py=last.py+M.cardH+M.vGap; }   // append below the last child
+  else { px=target.px+(M.nodeW+M.hGap); py=target.py; }                                          // first child: one column to the right
+  const g=document.createElementNS(NS,"g"); g.setAttribute("class","dropPreview");
+  const r=document.createElementNS(NS,"rect");
+  r.setAttribute("x",px); r.setAttribute("y",py); r.setAttribute("width",M.nodeW); r.setAttribute("height",M.cardH); r.setAttribute("rx",14); r.setAttribute("ry",14);
+  g.appendChild(r);
+  const t=document.createElementNS(NS,"text");
+  const title=(reorderDrag && NODES.get(reorderDrag)) ? NODES.get(reorderDrag).title : "";
+  t.setAttribute("x",px+14); t.setAttribute("y",py+30);
+  t.textContent="+" + (String(title).slice(0,30) || "new child");
+  g.appendChild(t);
+  viewport.appendChild(g);
+  dropPreview=g;
+}
+function hideDropPreview(){ if(dropPreview && dropPreview.parentNode) dropPreview.parentNode.removeChild(dropPreview); dropPreview=null; }
 function reorderPoint(e){
   const t=document.elementFromPoint(e.clientX,e.clientY);
   const g=(t&&t.closest)?t.closest("g.node"):null;
@@ -2974,33 +3501,39 @@ function reorderPoint(e){
     if(!reorderDrag) return;
     e.preventDefault();
     if(e.dataTransfer) e.dataTransfer.dropEffect="move";
-    clearReorderHl(); hideDropLine();
+    clearReorderHl(); hideDropPreview();
     const p=reorderPoint(e);
-    if(!p) return;
+    const dragged=NODES.get(reorderDrag);
+    if(!p||!dragged) return;
+    if(!isReParentTarget(dragged,p.n)) return;            // not a valid new parent → no highlight / no preview
     const gEl=document.elementFromPoint(e.clientX,e.clientY);
     const g=(gEl&&gEl.closest)?gEl.closest("g.node"):null;
-    if(g) g.classList.add("reorderover");
-    showDropLine(p.n.px, p.above?p.n.py : p.n.py+M.cardH);
+    if(g) g.classList.add("reorderover");                 // blue border on the prospective parent
+    showDropPreview(p.n);                                  // dashed "new child" ghost where it will land
   });
   sv.addEventListener("dragleave",function(e){
     if(!reorderDrag) return;
     const t=e.target;
-    if(t&&t.closest&&t.closest("g.node")) clearReorderHl();
+    if(t&&t.closest&&t.closest("g.node")){ clearReorderHl(); hideDropPreview(); }
   });
   sv.addEventListener("drop",function(e){
     if(!reorderDrag) return;
     e.preventDefault();
-    clearReorderHl(); hideDropLine();
+    clearReorderHl(); hideDropPreview();
     const dragged=NODES.get(reorderDrag);
     const p=reorderPoint(e);
+    const st=(window.__bjjDragStart)||{x:e.clientX,y:e.clientY};
     reorderDrag=null;
     if(!dragged||!p) return;
-    if(moveBubble(dragged,p.n,p.above)){
-      refreshBeltCountsInline();
-      ensurePath(dragged);
-      render();
-      revealNode(dragged.id);
+    if(p.n.id===dragged.id){                               // released back on itself
+      const dx=Math.abs(e.clientX-st.x), dy=Math.abs(e.clientY-st.y);
+      if(dx>0.38*M.nodeW && dx>1.6*dy){ expandSubtree(dragged); }   // horizontal swipe along the card → expand all children
+      return;
     }
+    let node;
+    if(rootOf(dragged)===rootOf(p.n)){ if(isReParentTarget(dragged,p.n)&&moveBubble(dragged,p.n,false)) node=dragged; }
+    else { if(isReParentTarget(dragged,p.n)) node=copyBubble(dragged,p.n,false); }
+    if(node){ refreshBeltCountsInline(); ensurePath(node); render(); revealNode(node.id); }
   });
 })();
 
@@ -3015,14 +3548,16 @@ function reorderPoint(e){
   let d = null;                     // { id, x0, y0, cx, cy, active, srcG }
   const THRESH = 8;                // px of travel before a press counts as a drag (else it's a tap)
 
-  function paint(cx, cy){          // same preview the desktop dragover shows
-    clearReorderHl(); hideDropLine();
+  function paint(cx, cy){          // blue border on the parent + dashed "new child" preview
+    clearReorderHl(); hideDropPreview();
     const p = reorderPoint({ clientX:cx, clientY:cy });
-    if(!p) return;
+    const dragged=NODES.get(d.id);
+    if(!p||!dragged) return;
+    if(!isReParentTarget(dragged,p.n)) return;
     const el2 = document.elementFromPoint(cx, cy);
     const g = (el2 && el2.closest) ? el2.closest("g.node") : null;
     if(g) g.classList.add("reorderover");
-    showDropLine(p.n.px, p.above ? p.n.py : p.n.py + M.cardH);
+    showDropPreview(p.n);
   }
 
   sv.addEventListener("pointerdown", function(e){
@@ -3034,7 +3569,7 @@ function reorderPoint(e){
     const id = (g && g.dataset) ? g.dataset.id : null;
     const n = (id && NODES.has(id)) ? NODES.get(id) : null;
     if(!n || n.depth === 0) return;                     // roots can't be moved
-    d = { id:n.id, x0:e.clientX, y0:e.clientY, cx:e.clientX, cy:e.clientY, active:false, srcG:g };
+    d = { id:n.id, x0:e.clientX, y0:e.clientY, cx:e.clientX, cy:e.clientY, active:false, srcG:g, swiped:false };
   }, { passive:true });
 
   window.addEventListener("pointermove", function(e){
@@ -3045,33 +3580,77 @@ function reorderPoint(e){
       d.active = true;
       if(d.srcG) d.srcG.classList.add("dragSrc");
     }
+    const dx=d.cx-d.x0, dy=d.cy-d.y0;
+    if(!d.swiped && Math.abs(dx) > 0.38*M.nodeW && Math.abs(dx) > 1.6*Math.abs(dy)){   // horizontal swipe along the card width
+      d.swiped=true;
+      clearReorderHl(); hideDropPreview();
+      const nd=NODES.get(d.id); if(nd) expandSubtree(nd);   // → expand all children
+      return;
+    }
+    if(d.swiped) return;                                     // already expanded via swipe — stop the re-parent preview
     paint(d.cx, d.cy);
   });
 
   function teardown(){
     if(d && d.srcG) d.srcG.classList.remove("dragSrc");
-    clearReorderHl(); hideDropLine();
+    clearReorderHl(); hideDropPreview();
     d = null;
   }
 
   window.addEventListener("pointerup", function(e){
     if(!d) return;
     if(!e.isPrimary){ teardown(); return; }            // a second finger joined → bail cleanly
+    const wasSwipe=!!d.swiped;
     const draggedId = d.id, cx = d.cx, cy = d.cy, wasDrag = d.active;
     teardown();
+    if(wasSwipe){ __lastTouchDragAt = Date.now(); return; }   // already expanded via swipe — swallow the trailing tap
     if(!wasDrag) return;                                // it was a tap → let the node's click open it
     __lastTouchDragAt = Date.now();                    // swallow any trailing synthetic tap that follows this drag
     const dragged = NODES.get(draggedId);
     const p = reorderPoint({ clientX:cx, clientY:cy });
-    if(dragged && p && moveBubble(dragged, p.n, p.above)){
-      refreshBeltCountsInline();
-      ensurePath(dragged);
-      render();
-      revealNode(dragged.id);
+    let node;
+    if(dragged && p && p.n.id!==draggedId){
+      if(rootOf(dragged)===rootOf(p.n)){ if(isReParentTarget(dragged,p.n)&&moveBubble(dragged,p.n,false)) node=dragged; }
+      else { if(isReParentTarget(dragged,p.n)) node=copyBubble(dragged,p.n,false); }
     }
+    if(node){ refreshBeltCountsInline(); ensurePath(node); render(); revealNode(node.id); }
   });
 
   window.addEventListener("pointercancel", teardown);
+})();
+
+/* ======================= LONG-PRESS → SHAKE (JIGGLE) MODE =======================
+   Hold any bubble (~0.45s, without moving) to enter iOS-style shake mode: every
+   non-root bubble wiggles and a red × appears at its top-right corner. Tap the × to
+   delete that bubble. Tap empty space, press Esc, or the "Done" chip to exit.
+   A quick tap or a drag (beyond the move threshold) cancels the long-press, so normal
+   click / drag-to-move behaviour is preserved. Works with mouse AND touch. */
+(function wireJiggle(){
+  const sv=document.getElementById("svg"); if(!sv) return;
+  const DUR=450, MOVE=10;
+  let timer=null, sx=0, sy=0;
+  function cancel(){ if(timer){ clearTimeout(timer); timer=null; } }
+  sv.addEventListener("pointerdown",function(e){
+    const gg=(e.target&&e.target.closest)?e.target.closest("g.node"):null;
+    if(!gg) return;
+    if(e.target&&e.target.closest&&(e.target.closest(".delbadge")||e.target.closest(".xall")||e.target.closest(".navbtn"))) return;
+    sx=e.clientX; sy=e.clientY;
+    if(timer) clearTimeout(timer);
+    timer=setTimeout(function(){
+      timer=null;
+      enterJiggle();
+      __lastTouchDragAt=Date.now();   // swallow the trailing synthetic tap that follows this hold
+    },DUR);
+  },{passive:true});
+  window.addEventListener("pointermove",function(e){
+    if(timer && Math.hypot(e.clientX-sx,e.clientY-sy)>MOVE) cancel();   // it's a drag/scroll, not a hold
+  },{passive:true});
+  window.addEventListener("pointerup",cancel,{passive:true});
+  window.addEventListener("pointercancel",cancel);
+  sv.addEventListener("click",function(){ if(shakeMode) exitJiggle(); });   // node/badge taps stopPropagation → only background reaches this
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&shakeMode) exitJiggle(); });
+  const done=document.getElementById("jiggleDone");
+  if(done) done.addEventListener("click",function(){ exitJiggle(); });
 })();
 
 renderLib("");
