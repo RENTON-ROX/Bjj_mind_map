@@ -95,7 +95,18 @@ svg.map.panning{cursor:grabbing}
 .cardInner .pill{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--belt);background:color-mix(in srgb,var(--belt) 16%,transparent);padding:2px 8px;border-radius:999px}
 .cardInner .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--belt)}
 .cardInner .more{margin-left:8px;font-size:10px;font-weight:700;color:var(--muted2)}
+.cardInner .nav{display:inline-flex;align-items:center;gap:2px;margin-left:8px}
+.cardInner .navbtn{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted2);width:20px;height:19px;line-height:1;font-size:12px;font-weight:700;border-radius:6px;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.cardInner .navbtn:hover{color:var(--ink);border-color:var(--belt);background:color-mix(in srgb,var(--belt) 22%, transparent)}
+.cardInner .navbtn:disabled{opacity:.32;cursor:default;pointer-events:none}
 .node .vdot{filter:drop-shadow(0 0 4px rgba(0,0,0,.5))}
+/* Iridescent identity for CUSTOM (user-created) bubbles */
+@keyframes iriShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes iriHue{0%{stroke:#ff5fa2}25%{stroke:#ffc24b}50%{stroke:#48e0a2}75%{stroke:#4bb8ff}100%{stroke:#ff5fa2}}
+.node.custom .cardInner .pill{color:#0b0f17;border:1px solid rgba(255,255,255,.45);background-image:linear-gradient(100deg,#ff5fa2,#ffc24b,#48e0a2,#4bb8ff,#a475ff,#ff5fa2);background-size:300% 100%;animation:iriShift 6s linear infinite}
+.node.custom .cardInner .pill .dot{background:radial-gradient(circle at 32% 30%,#fff,#e9f6ff 45%,#bfe0ff 100%);box-shadow:0 0 0 1px rgba(11,15,23,.35),0 0 6px rgba(255,255,255,.85)}
+.node.custom .accent{animation:iriHue 6s linear infinite}
+.node.custom .card{animation:iriHue 8s linear infinite}
 .mapbtns{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px;z-index:3}
 .mapbtns button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
 .mapbtns button:hover{background:#1a2740;border-color:#33507e}
@@ -236,11 +247,11 @@ main.libcollapsed .lib-open-tab{display:flex}
 <div class="brand"><div class="logo">BJJ</div></div>
 
 <div class="controls">
-<button class="btn" id="expandAll" title="Expand all"><span class="ico">⤢</span><span class="long">Expand all</span></button>
+<button class="btn" id="addRootBtn" title="Add a new root bubble"><span class="ico">⊕</span><span class="long">Add root</span></button><button class="btn" id="expandAll" title="Expand all"><span class="ico">⤢</span><span class="long">Expand all</span></button>
 <button class="btn" id="collapseAll" title="Collapse all"><span class="ico">⤡</span><span class="long">Collapse all</span></button>
 <div class="zoomgroup"><button id="zoomOut" title="Zoom out">-</button><button id="zoomIn" title="Zoom in">+</button></div>
 <button class="btn primary" id="fitBtn" title="Fit to view"><span class="ico">⛶</span><span class="long">Fit to view</span></button>
-<button class="btn" id="exportBtn" title="Download a self-contained copy"><span class="ico">↓</span><span class="long">Export self-contained</span><span class="short">Export</span></button>
+<button class="btn" id="exportBtn" style="display:none" title="Download a self-contained copy"><span class="ico">↓</span><span class="long">Export self-contained</span><span class="short">Export</span></button>
 </div>
 </header>
 <div class="belts" id="belts">
@@ -1556,10 +1567,12 @@ const ROOT = {
 /* ======================= COLORS ======================= */
 const BELT_COLOR = {
   "White":"#c7d0dd","Blue":"#4f8cff","Purple":"#b07cf7",
-  "Brown":"#e0a35e","Black":"#e7c268","Root":"#e7c268"
+  "Brown":"#e0a35e","Black":"#e7c268","Root":"#e7c268",
+  "Custom":"#ec6d9a"
 };
 const BELT_TINT = {
-  "White":"#2a3547","Blue":"#1c2c4a","Purple":"#2a2145","Brown":"#3a2c1c","Black":"#33301f","Root":"#33301f"
+  "White":"#2a3547","Blue":"#1c2c4a","Purple":"#2a2145","Brown":"#3a2c1c","Black":"#33301f","Root":"#33301f",
+  "Custom":"#2a2f38"
 };
 
 /* ======================= STATE ======================= */
@@ -1570,6 +1583,27 @@ const state = {
   expanded:new Set(),
   view:{x:0,y:0,s:1},
 };
+const VIEW_KEY="bjjView_v1";
+function saveView(){
+  try{
+    const v=state.view;
+    if(v && Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.s) && v.s>0){
+      localStorage.setItem(VIEW_KEY, JSON.stringify({x:v.x, y:v.y, s:v.s}));
+    }
+  }catch(e){}
+}
+function restoreView(){
+  try{
+    const raw=localStorage.getItem(VIEW_KEY);
+    if(!raw) return false;
+    const v=JSON.parse(raw);
+    if(!v || !Number.isFinite(v.x) || !Number.isFinite(v.y) || !Number.isFinite(v.s) || !(v.s>0)) return false;
+    state.view.x=v.x; state.view.y=v.y; state.view.s=Math.max(0.15,Math.min(2.5,v.s));
+    viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
+    return true;
+  }catch(e){ return false; }
+}
+
 
 /* ======================= USER BUBBLES =======================
    Bubbles the user adds at runtime. Stored as flat records
@@ -1588,6 +1622,8 @@ const userNodeRecords=(function(){
   return [...byUid.values()];
 })();
 function saveUserNodes(){ try{ localStorage.setItem(USER_NODES_KEY, JSON.stringify(userNodeRecords)); }catch(e){} }
+const EXPANDED_KEY="bjjExpanded_v1";
+function saveExpanded(){ try{ localStorage.setItem(EXPANDED_KEY, JSON.stringify(Array.from(state.expanded))); }catch(e){} }
 
 /* ===== Persistent edits to ANY bubble (incl. built-in) + deletions =====
    User-added bubbles persist via userNodeRecords (above). Built-in bubbles (ROOT/belts/
@@ -1628,6 +1664,16 @@ let nodeOrder={};
 (function(){ try{ nodeOrder=JSON.parse(localStorage.getItem(ORDER_KEY)||"{}")||{}; }catch(e){ nodeOrder={}; } })();
 function saveNodeOrder(){ try{ localStorage.setItem(ORDER_KEY, JSON.stringify(nodeOrder)); }catch(e){} }
 function applyNodeOrder(){
+  // restore root order (persisted under the "__ROOTS__" sentinel by nudge())
+  const rootOrder=nodeOrder["__ROOTS__"];
+  if(Array.isArray(rootOrder) && rootOrder.length){
+    const rank=new Map(rootOrder.map((id,i)=>[id,i]));
+    ROOTS.sort((a,b)=>{
+      const ra=rank.has(a.id)?rank.get(a.id):Infinity;
+      const rb=rank.has(b.id)?rank.get(b.id):Infinity;
+      return ra-rb; // stable sort → any root not in the saved list lands after the listed ones
+    });
+  }
   for(const pid in nodeOrder){
     const parent=NODES.get(pid); if(!parent||!parent.children) continue;
     const order=nodeOrder[pid]||[];
@@ -1661,7 +1707,9 @@ registerNode(MY_ROOT, null);
 const ROOTS = [MY_ROOT, ROOT];   // MY SKILLS first = drawn on top; "BJJ for Wrestlers" below
 /* Attach user bubbles (from this device, or baked into this file) */
 (function attachUserNodes(records){
-  let remaining=(records||[]).filter(r=>r&&r.uid&&r.parentId);
+  const all=(records||[]).filter(r=>r&&r.uid);
+  for(const r of all){ if(r.parentId) continue; const n={ title:String(r.title||"Untitled"), desc:String(r.desc==null?"":r.desc), how:Array.isArray(r.how)?r.how.map(s=>String(s)):[], why:String(r.why==null?"":r.why), cues:Array.isArray(r.cues)?r.cues.map(s=>String(s)):[], children:[], __user:true, uid:r.uid, belt:(r.belt||null) }; ROOTS.push(n); registerNode(n,null); }
+  let remaining=all.filter(r=>r.parentId);
   for(;;){
     const still=[]; let attached=0;
     for(const r of remaining){
@@ -1738,8 +1786,8 @@ function moveBubble(dragged,target,above){
   const keepBelt=beltOf(dragged);   // remember the card's current belt so it keeps its colour after moving
   // Decide the destination parent (block moves that would create a cycle)
   let newParent;
-  if(target===oldParent) newParent=oldParent;               // dropped on the parent card → top/bottom of its list
-  else if(PARENT.get(target.id)===oldParent.id) newParent=oldParent; // dropped on a sibling → reorder
+  if(target===oldParent) return false;                // own parent -> no-op (reorder with the up/down arrows)               // dropped on the parent card → top/bottom of its list
+  else if(PARENT.get(target.id)===oldParent.id) return false; // sibling -> no-op (drag attaches to a different bubble) // dropped on a sibling → reorder
   else if(isAncestorOf(dragged,target)) return false;        // target is inside dragged's own subtree → nesting would create a cycle
   else newParent=target;                                     // dropped elsewhere → re-parent under it (incl. promote to a higher level)
   target.children=target.children||[];
@@ -1753,12 +1801,28 @@ function moveBubble(dragged,target,above){
   PARENT.set(dragged.id,newParent.id);                       // keep the data model consistent
   redepth(dragged,newParent.depth+1);
   if(keepBelt) dragged.belt=keepBelt;   // lock colour: a White card stays White even after being moved elsewhere
-  state.expanded.add(newParent.id);
+  state.expanded.add(newParent.id); saveExpanded();
   if(dragged.__user){ const r=recordOf(dragged); if(r){ r.parentId=newParent.id; r.belt=(dragged.belt||null); } saveUserNodes(); }
   nodeOrder[oldParent.id]=(oldParent.children||[]).map(c=>c.id);
   if(newParent!==oldParent) nodeOrder[newParent.id]=(newParent.children||[]).map(c=>c.id);
   saveNodeOrder();
   return true;
+}
+
+function nudge(n, dir){
+  // dir: -1 = move up, +1 = move down. Reorder n among its siblings (the roots, or its parent children).
+  if(!n) return;
+  const pid=PARENT.get(n.id);
+  const cont = pid ? NODES.get(pid).children : ROOTS;
+  if(!cont || cont.length<2) return;
+  const i=cont.indexOf(n); if(i<0) return;
+  const j=i+dir; if(j<0 || j>=cont.length) return;
+  cont[i]=cont[j]; cont[j]=n;
+  const key = pid || "__ROOTS__";   // roots have no parent — persist their order under a sentinel key
+  nodeOrder[key]=(cont||[]).map(c=>c.id);
+  saveNodeOrder();
+  render();
+  revealNode(n.id);
 }
 function refreshBeltCounts(){
   BELTS.forEach(b=>{
@@ -1782,6 +1846,7 @@ function isExpanded(n){
 function setExpanded(n,v){
   if(!n.children) return;
   if(v) state.expanded.add(n.id); else state.expanded.delete(n.id);
+  saveExpanded();
 }
 function inUserBranch(n){
   let cur=n;
@@ -2095,9 +2160,10 @@ function render(){
   // Nodes
   ROOTS.forEach(function(r){
   (function walk(n){
-    const g=el("g",{class:"node depth"+n.depth+(state.selectedId===n.id?" selected":"")+(q&&!matches(n)?" dim":"")});
+    const isCustom = !!(n.__user && n.depth>0);   // user *bubbles* only — top-level roots keep "Root" styling
+    const g=el("g",{class:"node depth"+n.depth+(isCustom?" custom":"")+(state.selectedId===n.id?" selected":"")+(q&&!matches(n)?" dim":"")});
     g.setAttribute("data-id", n.id);
-    const belt = n.belt || (n.depth===0?"Root":beltOf(n));
+    const belt = isCustom ? "Custom" : (n.belt || (n.depth===0?"Root":beltOf(n)));
     const color = BELT_COLOR[belt]||"#888";
     const tint  = BELT_TINT[belt]||"#223049";
     g.style.setProperty("--belt",color);
@@ -2124,9 +2190,11 @@ function render(){
       `<div class="row">`+
         (belt?`<span class="pill"><span class="dot"></span>${belt.toUpperCase()}</span>`:"")+
         `<span class="more">${esc(more)}</span>`+
+        ((function(){ const pid=PARENT.get(n.id); const c=pid?NODES.get(pid).children:ROOTS; const i=c.indexOf(n); return (c&&c.length>1)?`<span class="nav"><button type="button" class="navbtn up" data-nav="up" title="Move above the previous bubble"${i>0?"":" disabled"}>↑</button><button type="button" class="navbtn down" data-nav="down" title="Move below the next bubble"${(i>=0&&i<c.length-1)?"":" disabled"}>↓</button></span>`:""; })())+
       `</div>`+
       `<p class="t">${esc(n.title)}</p>`+
       `<p class="d">${esc(n.desc)}</p>`;
+    div.querySelectorAll(".navbtn").forEach(function(b){ b.addEventListener("click",function(ev){ ev.stopPropagation(); ev.preventDefault(); nudge(n, b.dataset.nav==="up"?-1:1); }); b.addEventListener("dblclick",function(ev){ ev.stopPropagation(); ev.preventDefault(); }); });
     fo.appendChild(div);
     g.appendChild(fo);
     // Non-root bubbles are draggable so the user can reorder / re-parent them
@@ -2172,6 +2240,7 @@ function doToggleExpand(n){
   let p=PARENT.get(n.id);
   while(p){ setExpanded(NODES.get(p),true); p=PARENT.get(p); }
   render();
+  revealNode(n.id);   // re-center on the tapped node at a readable zoom
 }
 function onNodeClick(n){
   const now=Date.now();
@@ -2339,7 +2408,7 @@ function wireDetail(n, isUser){
       const t=addInput.value.trim();
       if(!t){ addInput.focus(); return; }
       const child=addChildBubble(n, t);
-      state.expanded.add(n.id);
+      state.expanded.add(n.id); saveExpanded();
       ensurePath(child);
       select(child); render();
       revealNode(child.id);   // bring the newly added bubble into view
@@ -2490,9 +2559,11 @@ function refreshBeltUI(){
 /* ---------- Toolbar ---------- */
 function expandAll(){
   ROOTS.forEach(function(r){ (function w(n){ if(n.children && n.children.length){ state.expanded.add(n.id); n.children.forEach(w); } })(r); });
-  render();
+  saveExpanded();
+  fit();
 }
-function collapseAll(){ state.expanded.clear(); render(); }
+function collapseAll(){ state.expanded.clear(); saveExpanded(); fit(); }
+function addRoot(){ let t=null; try{ t=window.prompt("Name the new root bubble:","New root"); }catch(e){ t="New root"; } if(t===null) return; t=String(t).trim()||"New root"; const uid="u"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); const rec={uid:uid, parentId:null, title:t, desc:"", how:[], why:"", cues:[], belt:null}; userNodeRecords.push(rec); saveUserNodes(); const node={ title:t, desc:"", how:[], why:"", cues:[], children:[], __user:true, uid:rec.uid, belt:null }; registerNode(node,null); ROOTS.push(node); render(); revealNode(node.id); }
 function exportSelfContained(){
   // Bake the current video links + user bubbles into the SEED blocks and download the file.
   const links = {};
@@ -2527,6 +2598,7 @@ function revealNode(id){
   state.view.x=(r.width/2)-cx*s;
   state.view.y=(r.height/2)-cy*s;
   viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
+  saveView();
 }
 function fit(){
   const {mapW,mapH}=computeLayout();
@@ -2536,6 +2608,7 @@ function fit(){
   state.view.x=(r.width-(mapW+40)*s)/2;
   state.view.y=(r.height-(mapH+40)*s)/2;
   render();
+  saveView();
 }
 /* Mobile: fit-to-whole-map collapses the tree to a few pixels on a phone
    (map ~6700px tall vs a ~650px viewport -> scale ~0.09, cards ~8px). Instead
@@ -2550,6 +2623,7 @@ function startMobile(){
   state.view.x=(w/2)-cx*s;
   state.view.y=18-cy*s;
   render();
+  saveView();
 }
 function zoomBy(f){
   const r=svg.getBoundingClientRect();
@@ -2559,6 +2633,7 @@ function zoomBy(f){
   state.view.y = cy - (cy-state.view.y)*(ns/state.view.s);
   state.view.s=ns;
   render();
+  saveView();
 }
 
 /* pan & pinch-zoom on svg (mouse + touch). One finger pans; two fingers
@@ -2603,7 +2678,7 @@ svg.addEventListener("pointermove",e=>{
 function endPointer(e){
   svgPointers.delete(e.pointerId);
   if(svgPointers.size<2) pinch=null;
-  if(svgPointers.size===0){ panning=null; svg.classList.remove("panning"); }
+  if(svgPointers.size===0){ panning=null; svg.classList.remove("panning"); saveView(); }
 }
 svg.addEventListener("pointerup",endPointer);
 svg.addEventListener("pointercancel",endPointer);
@@ -2617,9 +2692,11 @@ svg.addEventListener("wheel",e=>{
   state.view.y = my - (my-state.view.y)*(ns/state.view.s);
   state.view.s=ns;
   viewport.setAttribute("transform",`translate(${state.view.x},${state.view.y}) scale(${state.view.s})`);
+  saveView();
 },{passive:false});
 
 /* ---------- Wire controls ---------- */
+document.getElementById("addRootBtn").onclick=addRoot;
 document.getElementById("expandAll").onclick=expandAll;
 document.getElementById("collapseAll").onclick=collapseAll;
 document.getElementById("fitBtn").onclick=fit;
@@ -2632,7 +2709,7 @@ const LIB = { collapsed:new Set() };
 let currentLibQuery = "";
 function libDiv(cls){ const d=document.createElement("div"); if(cls) d.className=cls; return d; }
 
-/* ---------- USER section: live index of the user's own populated cards ---------- */
+/* ---------- USER section: live index of the user's own bubbles (added via "Add a bubble") ---------- */
 const USER_COLOR = "#2dd4bf";   // teal accent for the "User" section
 const USER_SEED = [
   { title:"Attack",  desc:"", how:[], why:"", cues:[] },
@@ -2651,7 +2728,10 @@ function collectUserCards(){
   const out=[]; const seen=new Set();
   (ROOTS||[]).forEach(function(root){
     (function walk(n){
-      if(n && n.__user && isPopulated(n) && !seen.has(n.id)){ seen.add(n.id); out.push(n); }
+      // List user *bubbles* (depth > 0) that have a title (content NOT required),
+      // so a bubble shows up in the library the moment it is added. Top-level roots
+      // (depth 0) are categories, not techniques, so they stay out of this list.
+      if(n && n.__user && n.depth>0 && String(n.title||"").trim() && !seen.has(n.id)){ seen.add(n.id); out.push(n); }
       (n.children||[]).forEach(walk);
     })(root);
   });
@@ -2845,7 +2925,7 @@ function refreshBeltCountsInline(){
       if(!data) return;
       const target = libNodeAt(e.clientX, e.clientY);
       const node = addChildBubble(target, data);
-      state.expanded.add(target.id);
+      state.expanded.add(target.id); saveExpanded();
       refreshBeltCountsInline();
       select(node);
       render();
@@ -2918,7 +2998,6 @@ function reorderPoint(e){
     if(moveBubble(dragged,p.n,p.above)){
       refreshBeltCountsInline();
       ensurePath(dragged);
-      select(dragged);
       render();
       revealNode(dragged.id);
     }
@@ -2951,6 +3030,7 @@ function reorderPoint(e){
     if(e.button !== undefined && e.button !== 0) return;
     const g = (e.target && e.target.closest) ? e.target.closest("g.node") : null;
     if(!g) return;
+    if(e.target && e.target.closest && e.target.closest(".navbtn")) return;   // taps on the up/down buttons are handled by the button, not as a drag
     const id = (g && g.dataset) ? g.dataset.id : null;
     const n = (id && NODES.has(id)) ? NODES.get(id) : null;
     if(!n || n.depth === 0) return;                     // roots can't be moved
@@ -2986,7 +3066,6 @@ function reorderPoint(e){
     if(dragged && p && moveBubble(dragged, p.n, p.above)){
       refreshBeltCountsInline();
       ensurePath(dragged);
-      select(dragged);
       render();
       revealNode(dragged.id);
     }
@@ -3000,19 +3079,20 @@ renderLib("");
 /* ---------- Init ---------- */
 buildBeltChips();
 refreshBeltUI();
-// Start with the root, the White belt, and its first topic expanded
-state.expanded.add(ROOT.id);
-{
+// Remember the last expanded/collapsed state across refreshes; on first run default to root + White + its first topic
+(function restoreExpanded(){
+  let raw=null, saved=null, has=false;
+  try{ raw=localStorage.getItem(EXPANDED_KEY); if(raw!=null){ saved=JSON.parse(raw); has=true; } }catch(e){ has=false; saved=null; }
+  if(has && Array.isArray(saved)){ saved.forEach(function(id){ state.expanded.add(id); }); return; }
+  state.expanded.add(ROOT.id);
   const wb=[...NODES.values()].find(n=>n.belt==="White");
-  if(wb){
-    state.expanded.add(wb.id);
-    if(wb.children && wb.children[0]) state.expanded.add(wb.children[0].id);
-  }
-}
+  if(wb){ state.expanded.add(wb.id); if(wb.children && wb.children[0]) state.expanded.add(wb.children[0].id); }
+})();
 select(ROOT);   // populate the detail panel with the overview + the 5 belts
 closeDetailSheet();   // start closed on all sizes; the panel opens when a card is clicked
 render();
 requestAnimationFrame(function(){
+  if(restoreView()){ return; }   // restore remembered pan/zoom so a newly added root (or wherever you left it) stays in view across a refresh
   if(window.matchMedia && window.matchMedia("(max-width: 1024px)").matches){
     startMobile();           // phones: readable scale centred on the root (not fit-to-whole-map)
   } else {
